@@ -4,6 +4,8 @@ import com.socialnetwork.weconnect.Service.FilesStorageService;
 import com.socialnetwork.weconnect.dto.request.FileInfo;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
 import lombok.AllArgsConstructor;
+
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,10 +29,10 @@ public class FilesController {
 
 	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ApiResponse<List<String>> uploadFiles(@RequestPart("content") String content,
-			@RequestPart("files") MultipartFile[] files) {
+			@RequestPart("files") MultipartFile[] files, Principal connectedUser) {
 		List<String> fileNames = new ArrayList<>();
 		Arrays.asList(files).stream().forEach(file -> {
-			storageService.save(file);
+			storageService.save(file, connectedUser);
 			fileNames.add(file.getOriginalFilename());
 		});
 		return ApiResponse.<List<String>>builder().message("Uploaded the files successfully: ").result(fileNames)
@@ -38,18 +40,18 @@ public class FilesController {
 	}
 
 	@GetMapping("/files")
-	public ApiResponse<List<FileInfo>> getListFiles() {
-		List<FileInfo> fileInfos = storageService.loadAll().map(path -> {
+	public ApiResponse<List<FileInfo>> getListImageByUser(Principal connectedUser) {
+		List<FileInfo> fileInfos = storageService.loadAllByUserName(connectedUser).map(path -> {
 			String filename = path.getFileName().toString();
 			String url = MvcUriComponentsBuilder
-					.fromMethodName(FilesController.class, "getFile", path.getFileName().toString()).build().toString();
+					.fromMethodName(FilesController.class, "getFile", filename, connectedUser).build().toString();
 			return new FileInfo(filename, url);
 		}).collect(Collectors.toList());
 		return ApiResponse.<List<FileInfo>>builder().result(fileInfos).build();
 	}
 
 	@GetMapping("/files/{filename:.+}")
-	public ApiResponse<String> getFile(@PathVariable String filename) {
-		return ApiResponse.<String>builder().result(storageService.load(filename)).build();
+	public ApiResponse<String> getFile(@PathVariable String filename, Principal connectedUser) {
+		return ApiResponse.<String>builder().result(storageService.load(filename, connectedUser)).build();
 	}
 }
