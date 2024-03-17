@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.socialnetwork.weconnect.Service.JwtService;
 import com.socialnetwork.weconnect.token.TokenRepository;
 
 @Component

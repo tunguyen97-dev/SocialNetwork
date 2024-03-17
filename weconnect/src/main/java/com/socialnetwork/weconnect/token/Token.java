@@ -1,6 +1,6 @@
 package com.socialnetwork.weconnect.token;
 
-import com.socialnetwork.weconnect.user.User;
+import com.socialnetwork.weconnect.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

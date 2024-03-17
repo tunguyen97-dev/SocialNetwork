@@ -13,16 +13,16 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-import static com.socialnetwork.weconnect.user.Permission.ADMIN_CREATE;
-import static com.socialnetwork.weconnect.user.Permission.ADMIN_DELETE;
-import static com.socialnetwork.weconnect.user.Permission.ADMIN_READ;
-import static com.socialnetwork.weconnect.user.Permission.ADMIN_UPDATE;
-import static com.socialnetwork.weconnect.user.Permission.MANAGER_CREATE;
-import static com.socialnetwork.weconnect.user.Permission.MANAGER_DELETE;
-import static com.socialnetwork.weconnect.user.Permission.MANAGER_READ;
-import static com.socialnetwork.weconnect.user.Permission.MANAGER_UPDATE;
-import static com.socialnetwork.weconnect.user.Role.ADMIN;
-import static com.socialnetwork.weconnect.user.Role.MANAGER;
+import static com.socialnetwork.weconnect.config.Permission.ADMIN_CREATE;
+import static com.socialnetwork.weconnect.config.Permission.ADMIN_DELETE;
+import static com.socialnetwork.weconnect.config.Permission.ADMIN_READ;
+import static com.socialnetwork.weconnect.config.Permission.ADMIN_UPDATE;
+import static com.socialnetwork.weconnect.config.Permission.MANAGER_CREATE;
+import static com.socialnetwork.weconnect.config.Permission.MANAGER_DELETE;
+import static com.socialnetwork.weconnect.config.Permission.MANAGER_READ;
+import static com.socialnetwork.weconnect.config.Permission.MANAGER_UPDATE;
+import static com.socialnetwork.weconnect.config.Role.ADMIN;
+import static com.socialnetwork.weconnect.config.Role.MANAGER;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
@@ -36,6 +36,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfiguration {
 
     private static final String[] WHITE_LIST_URL = {"/api/v1/auth/**",
+    		"/api/v1/file/**",
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",

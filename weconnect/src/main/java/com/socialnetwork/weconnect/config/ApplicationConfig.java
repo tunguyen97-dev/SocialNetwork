@@ -1,7 +1,7 @@
 package com.socialnetwork.weconnect.config;
 
 import com.socialnetwork.weconnect.auditing.ApplicationAuditAware;
-import com.socialnetwork.weconnect.user.UserRepository;
+import com.socialnetwork.weconnect.repository.UserRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
