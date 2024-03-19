@@ -1,17 +1,18 @@
 package com.socialnetwork.weconnect.controller;
 
 import com.socialnetwork.weconnect.Service.FilesStorageService;
+import com.socialnetwork.weconnect.Service.PostService;
 import com.socialnetwork.weconnect.dto.request.FileInfo;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
+import com.socialnetwork.weconnect.entity.User;
 import lombok.AllArgsConstructor;
-
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,19 +25,20 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/file")
-public class FilesController {
+public class PostController {
 	private final FilesStorageService storageService;
+	private final PostService postService;
 
 	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ApiResponse<List<String>> uploadFiles(@RequestPart("content") String content,
+	public ApiResponse<List<String>> uploadPost(@RequestPart("content") String content,
 			@RequestPart("files") MultipartFile[] files, Principal connectedUser) {
-		List<String> fileNames = new ArrayList<>();
+		var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+		List<String> urlList = new ArrayList<>();
 		Arrays.asList(files).stream().forEach(file -> {
-			storageService.save(file, connectedUser);
-			fileNames.add(file.getOriginalFilename());
+			urlList.add(storageService.saveTosServer(file, user.getFirstname()));
 		});
-		return ApiResponse.<List<String>>builder().message("Uploaded the files successfully: ").result(fileNames)
-				.build();
+		postService.savePostToDB(content, urlList, user);
+		return ApiResponse.<List<String>>builder().message("Uploaded the files successfully: ").result(urlList).build();
 	}
 
 	@GetMapping("/files")
@@ -44,14 +46,14 @@ public class FilesController {
 		List<FileInfo> fileInfos = storageService.loadAllByUserName(connectedUser).map(path -> {
 			String filename = path.getFileName().toString();
 			String url = MvcUriComponentsBuilder
-					.fromMethodName(FilesController.class, "getFile", filename, connectedUser).build().toString();
+					.fromMethodName(PostController.class, "getImage", filename, connectedUser).build().toString();
 			return new FileInfo(filename, url);
 		}).collect(Collectors.toList());
 		return ApiResponse.<List<FileInfo>>builder().result(fileInfos).build();
 	}
 
 	@GetMapping("/files/{filename:.+}")
-	public ApiResponse<String> getFile(@PathVariable String filename, Principal connectedUser) {
+	public ApiResponse<String> getImage(@PathVariable String filename, Principal connectedUser) {
 		return ApiResponse.<String>builder().result(storageService.load(filename, connectedUser)).build();
 	}
 }

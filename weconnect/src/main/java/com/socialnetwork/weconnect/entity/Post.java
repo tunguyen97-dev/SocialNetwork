@@ -1,6 +1,8 @@
 package com.socialnetwork.weconnect.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.security.Timestamp;
 import java.util.List;
@@ -16,13 +18,17 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Post {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String content;
 	private Timestamp created_at;
 	private Timestamp update__at;
+	
 	@OneToMany(mappedBy = "post")
 	private List<PostLike> postLikes;
 

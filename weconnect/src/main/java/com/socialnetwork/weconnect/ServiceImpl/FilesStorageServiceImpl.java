@@ -1,13 +1,12 @@
 package com.socialnetwork.weconnect.ServiceImpl;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
-import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
@@ -32,7 +31,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FilesStorageServiceImpl implements FilesStorageService {
 
-	Path root = Paths.get("uploads");
+	Path root = Paths.get("C:\\upload");
 
 	@Override
 	public void init() {
@@ -44,9 +43,9 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 	}
 
 	@Override
-	public void save(MultipartFile file, Principal connectedUser) {
-		var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
-		Path userDirectory = this.root.resolve(user.getFirstname());
+	public String saveTosServer(MultipartFile file, String userName) {
+
+		Path userDirectory = this.root.resolve(userName);
 		try {
 			if (!Files.exists(userDirectory)) {
 				Files.createDirectory(userDirectory);
@@ -55,8 +54,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 			String newFileName = getUniqueFilename(file.getOriginalFilename());
 			// Xử lý lưu vào server img
 			Files.copy(file.getInputStream(), userDirectory.resolve(newFileName));
-
-			// Xử lý lưu vào db
+			return userDirectory.resolve(newFileName).toString();
 
 		} catch (Exception e) {
 			throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
@@ -104,6 +102,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 	public String getUniqueFilename(String filename) {
 		// Định dạng tên file mới, có thể sử dụng timestamp hoặc số ngẫu nhiên để đảm
 		// bảo duy nhất
-		return FilenameUtils.getBaseName(filename) + "." + FilenameUtils.getExtension(filename);
+		return FilenameUtils.getBaseName(filename) + "_" + UUID.randomUUID().toString().substring(0, 10) + "."
+				+ FilenameUtils.getExtension(filename);
 	}
 }
