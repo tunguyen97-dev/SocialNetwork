@@ -4,8 +4,11 @@ import com.socialnetwork.weconnect.Service.FilesStorageService;
 import com.socialnetwork.weconnect.Service.PostService;
 import com.socialnetwork.weconnect.dto.request.FileInfo;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
+import com.socialnetwork.weconnect.entity.Post;
 import com.socialnetwork.weconnect.entity.User;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/file")
 public class PostController {
 	private final FilesStorageService storageService;
@@ -50,6 +53,11 @@ public class PostController {
 			return new FileInfo(filename, url);
 		}).collect(Collectors.toList());
 		return ApiResponse.<List<FileInfo>>builder().result(fileInfos).build();
+	}
+	
+	@GetMapping("/posts/{postId:.+}")
+	public ApiResponse<Post> getPostByUserIdAndPostId(@PathVariable Integer postId, Principal connectedUser) {
+		return ApiResponse.<Post>builder().result(postService.getPostByUserIdAndPostId(postId, connectedUser)).build();
 	}
 
 	@GetMapping("/files/{filename:.+}")
