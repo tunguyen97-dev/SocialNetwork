@@ -1,8 +1,10 @@
 package com.socialnetwork.weconnect.ServiceImpl;
 
+import java.security.Principal;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import com.socialnetwork.weconnect.Service.PostService;
+import com.socialnetwork.weconnect.dto.response.PostInfoDto;
 import com.socialnetwork.weconnect.entity.Post;
 import com.socialnetwork.weconnect.entity.User;
 import com.socialnetwork.weconnect.repository.PostRepository;
@@ -26,4 +28,12 @@ public class PostServiceImpl implements PostService {
 		postRepository.save(post);
 	}
 
+	@Override
+	public Post getPostByUserIdAndPostId(Integer postId, Principal connectedUser) {
+		List<PostInfoDto> infoDto = postRepository.getAllPosts();
+		for (PostInfoDto postInfoDto : infoDto) {
+			System.out.print(postInfoDto.getPostComments() +"\n");
+		}
+		return null;
+	}
 }
