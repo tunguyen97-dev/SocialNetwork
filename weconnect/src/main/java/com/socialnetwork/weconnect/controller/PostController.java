@@ -4,6 +4,7 @@ import com.socialnetwork.weconnect.Service.FilesStorageService;
 import com.socialnetwork.weconnect.Service.PostService;
 import com.socialnetwork.weconnect.dto.request.FileInfo;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
+import com.socialnetwork.weconnect.dto.response.PostInfoDto;
 import com.socialnetwork.weconnect.entity.Post;
 import com.socialnetwork.weconnect.entity.User;
 import lombok.AllArgsConstructor;
@@ -55,9 +56,9 @@ public class PostController {
 		return ApiResponse.<List<FileInfo>>builder().result(fileInfos).build();
 	}
 	
-	@GetMapping("/posts/{postId:.+}")
-	public ApiResponse<Post> getPostByUserIdAndPostId(@PathVariable Integer postId, Principal connectedUser) {
-		return ApiResponse.<Post>builder().result(postService.getPostByUserIdAndPostId(postId, connectedUser)).build();
+	@GetMapping("/posts/{userId:.+}")
+	public ApiResponse<List<PostInfoDto>> getPostsByUserId(@PathVariable Integer userId, Principal connectedUser) {
+		return ApiResponse.<List<PostInfoDto>>builder().result(postService.getAllPostsByUserId(userId, connectedUser)).build();
 	}
 
 	@GetMapping("/files/{filename:.+}")

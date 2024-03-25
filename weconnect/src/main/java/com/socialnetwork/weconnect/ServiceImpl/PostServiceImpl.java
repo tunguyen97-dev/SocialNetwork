@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import com.socialnetwork.weconnect.Service.PostService;
+import com.socialnetwork.weconnect.dto.response.PostDto;
 import com.socialnetwork.weconnect.dto.response.PostInfoDto;
 import com.socialnetwork.weconnect.entity.Post;
 import com.socialnetwork.weconnect.entity.User;
@@ -29,11 +30,17 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public Post getPostByUserIdAndPostId(Integer postId, Principal connectedUser) {
-		List<PostInfoDto> infoDto = postRepository.getAllPosts();
+	public List<PostInfoDto> getAllPostsByUserId(Integer userId, Principal connectedUser) {
+		List<PostInfoDto> infoDto = postRepository.getAllPostsByUserId(userId);
 		for (PostInfoDto postInfoDto : infoDto) {
-			System.out.print(postInfoDto.getPostComments() +"\n");
+			System.out.println(postInfoDto.getPostId());
+			System.out.println(postInfoDto.getContent());
+			System.out.println(postInfoDto.getCreatedAt());
+			System.out.println(postInfoDto.getUpdateAt());
+			System.out.println(postInfoDto.getPostImages());
+			System.out.println(postInfoDto.getPostLikes());
+			System.out.println(postInfoDto.getPostLikes());
 		}
-		return null;
+		return infoDto;
 	}
 }
