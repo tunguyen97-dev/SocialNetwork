@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 public interface PostInfoDto {
 	long getPostId();
 	
+	String getFirstName();
+	
     String getContent();
     
     //@Value("#{target.createdAt}")
@@ -12,13 +14,13 @@ public interface PostInfoDto {
     
     String getUpdateAt();
     
-    @Value("#{target.postComments}")
-    String getPostComments();
-    
     @Value("#{target.postImages}")
     String getPostImages();
     
-    @Value("#{target.postLikes}")
-    String getPostLikes();
+    @Value("#{target.postComments}")
+    String getPostComments();
+    
+//    @Value("#{target.postLikes}")
+//    String getPostLikes();
    
 }

@@ -17,25 +17,35 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
 	@Query(value = "select " +
                    "p.id as postId, " +
+			       "u.firstname as firstName, " +
                    "p.content as content, " +
                    "p.created_at as createdAt, " +
                    "p.update__at as updateAt, " +
-                   "(SELECT IFNULL(" +
-                   "  JSON_OBJECTAGG(cmt.id, JSON_OBJECT(" +
-                   "    'postId', cmt.post_id, " +
-                   "    'content', cmt.content, " +
-                   "    'createdAt', cmt.created_at, " +
-                   "    'updatedAt', cmt.update__at" +
-                   "  )), JSON_OBJECT()) " +
-                   "FROM comment cmt WHERE cmt.post_id = p.id) AS postComments, " +
-//                   "IFNULL((SELECT JSON_OBJECTAGG(pl.id,pl.post_id, pl.user_id) " +
-//                   "FROM post_like pl WHERE pl.post_id = p.id), JSON_OBJECT()) AS postLikes " +
-                   "(SELECT IFNULL(JSON_OBJECTAGG(pi.post_id, pi.images), JSON_OBJECT()) " +
-                   "FROM post_images pi WHERE pi.post_id = p.id) AS postImages " +
+                   "IFNULL(" +
+                   "CONCAT('[', GROUP_CONCAT(JSON_QUOTE(pi.images) SEPARATOR ', '), ']')" +
+                   ", '[]') AS postImages, " +
+                   "CASE WHEN COUNT(c.id) > 0 THEN CONCAT('[', GROUP_CONCAT(DISTINCT " +
+                   "JSON_OBJECT(" +
+                   "'comment_id', c.id, " +
+                   "'comment_content', c.content, " +
+                   "'comment_user_id', c.user_id, " +
+                   "'comment_created_at', c.created_at, " +
+                   "'comment_is_deleted', c.is_deleted" +
+                   ")" +
+                   "SEPARATOR ', '" +
+                   " ), ']')" +
+                   "ELSE '[]'" +
+                   "END " +
+                   "AS postComments " +
                    "from post p " +
 			       "inner join _user u " +
                    "on p.user_id = u.id " +
-                   "where p.user_id = :userId ",
+			       "left join post_images pi " +
+			       "on pi.post_id = p.id " +
+			       "left join comment c " +
+			       "on c.post_id = p.id " +
+                   "where p.user_id = :userId " +
+			       "group by p.id",
 		nativeQuery = true)
 	List<PostInfoDto> getAllPostsByUserId(Integer userId);
 

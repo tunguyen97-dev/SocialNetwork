@@ -28,5 +28,5 @@ public class Comment {
 	private User user;
 	private Timestamp created_at;
 	private Timestamp update__at;
-	private Boolean isDeleted;
+	private Integer isDeleted;
 }

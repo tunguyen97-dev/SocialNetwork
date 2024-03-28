@@ -38,8 +38,7 @@ public class PostServiceImpl implements PostService {
 			System.out.println(postInfoDto.getCreatedAt());
 			System.out.println(postInfoDto.getUpdateAt());
 			System.out.println(postInfoDto.getPostImages());
-			System.out.println(postInfoDto.getPostLikes());
-			System.out.println(postInfoDto.getPostLikes());
+			System.out.println(postInfoDto.getPostComments());
 		}
 		return infoDto;
 	}
