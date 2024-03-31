@@ -42,8 +42,10 @@ public class AuthenticationService {
 		if (userCheck.isPresent()) {
 			throw new AppException(ErrorCode.USER_EXITED);
 		}
-		var user = User.builder().firstname(request.getFirstname()).lastname(request.getLastname())
-				.email(request.getEmail()).password(passwordEncoder.encode(request.getPassword()))
+		var user = User.builder()
+				.name(request.getUserName())
+				.email(request.getEmail())
+				.password(passwordEncoder.encode(request.getPassword()))
 				.role(request.getRole()).build();
 		var savedUser = userRepository.save(user);
 		var jwtToken = jwtService.generateToken(user);

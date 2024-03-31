@@ -1,7 +1,5 @@
 package com.socialnetwork.weconnect.entity;
 
-import java.security.Timestamp;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,5 +23,5 @@ public class Friend {
 	@JoinColumn(name = "user2_id")
 	private User user2;
 
-	private Timestamp created_at;
+	private String createdAt;
 }

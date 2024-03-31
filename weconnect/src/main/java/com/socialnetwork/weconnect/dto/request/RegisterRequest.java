@@ -17,11 +17,13 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegisterRequest {
 
-	@Size(min = 3, message = "USERNAME_INVALID")
-	String firstname;
-	String lastname;
+	@Size(min = 3, message = "USERNAME INVALID")
+	String userName;
+	
 	String email;
-	@Size(min = 8, message = "PASSWORD_INVALID")
+	
+	@Size(min = 8, message = "PASSWORD INVALID")
 	String password;
+	
 	Role role;
 }

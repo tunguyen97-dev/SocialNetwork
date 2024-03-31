@@ -16,8 +16,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthenticationResponse {
 
-	@JsonProperty("access_token")
+	@JsonProperty("accessToken")
 	String accessToken;
-	@JsonProperty("refresh_token")
+	@JsonProperty("refreshToken")
 	String refreshToken;
 }

@@ -19,7 +19,11 @@ public enum ErrorCode {
 	IMAGE_NOT_EXISTED(1008,"Image not existed", HttpStatus.NOT_FOUND),
 	URL_INVALID(1009,"Invalid URL", HttpStatus.BAD_REQUEST),
 	UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
-	UNAUTHORIZED(1010, "You do not have permission", HttpStatus.FORBIDDEN);
+	UNAUTHORIZED(1010, "You do not have permission", HttpStatus.FORBIDDEN),
+	POST_NOT_EXISTED(1011,"Post not existed", HttpStatus.NOT_FOUND),
+	POST_NOT_EXISTED_OR_USER_NOT_EXISTED(1012,"Post or user not existed", HttpStatus.NOT_FOUND),
+	INVALID_DATA(1013, "Updated data and original data have no difference", HttpStatus.BAD_REQUEST),
+	COMMENT_NOT_EXISTED(1014,"Comment not existed", HttpStatus.NOT_FOUND);
 
 	int code;
 	String message;

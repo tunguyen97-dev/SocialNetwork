@@ -26,15 +26,15 @@ import com.socialnetwork.weconnect.token.Token;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "_user")
+@Table(name = "user")
 public class User implements UserDetails {
 
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue
 	Integer id;
-	private String firstname;
-	private String lastname;
+	
+	private String name;
 	private String email;
 	private String password;
 

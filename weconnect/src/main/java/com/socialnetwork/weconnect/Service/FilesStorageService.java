@@ -10,11 +10,19 @@ public interface FilesStorageService {
 
 	public String saveTosServer(MultipartFile file, String userName);
 
-	public String load(String filename, Principal connectedUser);
+	public boolean delTosServer(String file, String userName);
+
+	public String load(String filename);
 
 	public void deleteAll();
 
-	public Stream<Path> loadAllByUserName(Principal connectedUser);
+	public Stream<Path> loadAllByUserName();
 
-	public String getUniqueFilename(String filename);
+	public String getUniqueFilename(String fileName);
+
+	public Path getRoot();
+
+	public boolean checkExistFileName(String fileName, Path userDirectory);
+
+	public String saveToFileServer(String filePath, String userName);
 }

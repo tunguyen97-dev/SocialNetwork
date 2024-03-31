@@ -1,6 +1,9 @@
 package com.socialnetwork.weconnect.entity;
 
-import java.security.Timestamp;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -9,19 +12,27 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
 @Data
+@Table(name = "post_likes")
 public class PostLike {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private Timestamp created_at;
-	private Timestamp update__at;
+	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JsonIgnore
 	private Post post;
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
 	private User user;
+	
+	private String createdAt;
+	private String updatedAt;
 }
