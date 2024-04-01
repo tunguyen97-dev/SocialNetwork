@@ -23,7 +23,8 @@ public enum ErrorCode {
 	POST_NOT_EXISTED(1011,"Post not existed", HttpStatus.NOT_FOUND),
 	POST_NOT_EXISTED_OR_USER_NOT_EXISTED(1012,"Post or user not existed", HttpStatus.NOT_FOUND),
 	INVALID_DATA(1013, "Updated data and original data have no difference", HttpStatus.BAD_REQUEST),
-	COMMENT_NOT_EXISTED(1014,"Comment not existed", HttpStatus.NOT_FOUND);
+	COMMENT_NOT_EXISTED(1014,"Comment not existed", HttpStatus.NOT_FOUND),
+	TOKEN_NOT_EXISTED(1015,"Token not existed", HttpStatus.NOT_FOUND);
 
 	int code;
 	String message;

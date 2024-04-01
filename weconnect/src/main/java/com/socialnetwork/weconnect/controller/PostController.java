@@ -58,7 +58,7 @@ public class PostController {
 	}
 
 	@GetMapping("/post/{postId:.+}")
-	public ApiResponse<Post> getPostById(@PathVariable Integer postId) {
+	public ApiResponse<Post> getPostByPostId(@PathVariable Integer postId) {
 		return ApiResponse.<Post>builder().result(postService.getPostById(postId)).build();
 	}
 	
