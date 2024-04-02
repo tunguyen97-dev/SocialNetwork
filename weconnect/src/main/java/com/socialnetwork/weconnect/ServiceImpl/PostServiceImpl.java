@@ -1,6 +1,5 @@
 package com.socialnetwork.weconnect.ServiceImpl;
 
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.socialnetwork.weconnect.Service.FilesStorageService;
 import com.socialnetwork.weconnect.Service.PostService;
 import com.socialnetwork.weconnect.dto.request.UpdatePostRequest;
+import com.socialnetwork.weconnect.entity.Comment;
 import com.socialnetwork.weconnect.entity.Post;
 import com.socialnetwork.weconnect.entity.User;
 import com.socialnetwork.weconnect.exception.AppException;
@@ -23,18 +23,14 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostServiceImpl implements PostService {
-	
+
 	PostRepository postRepository;
 	FilesStorageService storageService;
 
 	@Override
 	public void savePostToDB(String content, List<String> files, User user) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Post post = Post.builder()
-				.user(user)
-				.content(content)
-				.postImages(files)
-				.createdAt(sdf.format(new Date()))
+		Post post = Post.builder().user(user).content(content).postImages(files).createdAt(sdf.format(new Date()))
 				.isDeleted(false).build();
 		postRepository.save(post);
 	}
@@ -128,5 +124,4 @@ public class PostServiceImpl implements PostService {
 		post.setUpdatedAt(sdf.format(new Date()));
 		return postRepository.save(post);
 	}
-
 }

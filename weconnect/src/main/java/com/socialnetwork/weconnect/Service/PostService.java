@@ -13,7 +13,7 @@ public interface PostService {
 	public void savePostToDB(String content, List<String> file, User userId);
 
 	public List<Post> getAllPostsByUserId(Integer userId);
-
+	
 	public Post getPostById(Integer postId);
 
 	public Boolean delPostById(Integer postId);

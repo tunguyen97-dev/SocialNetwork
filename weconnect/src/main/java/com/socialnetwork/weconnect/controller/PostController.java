@@ -4,6 +4,7 @@ import com.socialnetwork.weconnect.Service.FilesStorageService;
 import com.socialnetwork.weconnect.Service.PostService;
 import com.socialnetwork.weconnect.dto.request.UpdatePostRequest;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
+import com.socialnetwork.weconnect.entity.Comment;
 import com.socialnetwork.weconnect.entity.Post;
 import com.socialnetwork.weconnect.entity.User;
 
@@ -34,7 +35,7 @@ public class PostController {
 	private final FilesStorageService storageService;
 	private final PostService postService;
 
-	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/add-post", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ApiResponse<List<String>> uploadPost(@RequestPart("content") String content,
 			@RequestPart("files") MultipartFile[] imageFiles, Principal connectedUser) {
 		var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
@@ -52,24 +53,23 @@ public class PostController {
 		return ApiResponse.<String>builder().result(storageService.load(imageName)).build();
 	}
 	
-	@GetMapping("/{userId:.+}")
+	@GetMapping("/{userId}")
 	public ApiResponse<List<Post>> getAllPostsByUserId(@PathVariable Integer userId) {
 		return ApiResponse.<List<Post>>builder().result(postService.getAllPostsByUserId(userId)).build();
 	}
 
-	@GetMapping("/post/{postId:.+}")
+	@GetMapping("/post/{postId}")
 	public ApiResponse<Post> getPostByPostId(@PathVariable Integer postId) {
 		return ApiResponse.<Post>builder().result(postService.getPostById(postId)).build();
 	}
 	
-	@DeleteMapping("/post/{postId:.+}")
+	@DeleteMapping("/post/delete-post/{postId}")
 	public ApiResponse<Boolean> delPostByPostId(@PathVariable @NotNull Integer postId) {
 		return ApiResponse.<Boolean>builder().result(postService.delPostById(postId)).message("Đã xoá thành công").build();
 	}
 	
-	@PutMapping("/post")
+	@PutMapping("/post/update-post")
 	public ApiResponse<Post> updatePostByPostId(@RequestBody @NotNull UpdatePostRequest updatePostRequest) {
 		return ApiResponse.<Post>builder().result(postService.updatePostById(updatePostRequest)).build();
 	}
-
 }

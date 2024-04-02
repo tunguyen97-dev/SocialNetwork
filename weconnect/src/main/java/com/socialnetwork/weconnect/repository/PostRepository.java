@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.socialnetwork.weconnect.dto.request.PostImages;
+import com.socialnetwork.weconnect.entity.Comment;
 import com.socialnetwork.weconnect.entity.Post;
 
 @Repository
@@ -47,10 +48,14 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 //	List<PostInfoDto> getAllPostsByUserId(Integer userId);
 	@Query(value = "select * from post p where p.user_id = :userId", nativeQuery = true)
 	List<Post> findAllPostsByUserId(@Param("userId") Integer userId);
-	
+
 	Post findPostById(Integer id);
 
 	boolean existsByIdAndUserId(Integer postId, Integer id);
-	
+
 	Post findPostImagesById(Integer postId);
+
+	@Query(value = "select p.user_id from post p where p.id = :postId", nativeQuery = true)
+	Integer findUserIdById(Integer postId);
+
 }
