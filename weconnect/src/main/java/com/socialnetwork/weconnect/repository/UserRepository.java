@@ -9,6 +9,8 @@ import com.socialnetwork.weconnect.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-  Optional<User> findByEmail(String email);
+	Optional<User> findByEmail(String email);
+
+	User findUserById(Integer userId);
 
 }

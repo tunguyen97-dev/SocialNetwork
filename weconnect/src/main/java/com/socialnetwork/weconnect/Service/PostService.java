@@ -16,7 +16,7 @@ public interface PostService {
 	
 	public Post getPostById(Integer postId);
 
-	public Boolean delPostById(Integer postId);
+	public String delPostById(Integer postId);
 
 	public Post updatePostById(UpdatePostRequest updatePostRequest);
 

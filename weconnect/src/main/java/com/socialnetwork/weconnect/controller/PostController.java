@@ -4,11 +4,8 @@ import com.socialnetwork.weconnect.Service.FilesStorageService;
 import com.socialnetwork.weconnect.Service.PostService;
 import com.socialnetwork.weconnect.dto.request.UpdatePostRequest;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
-import com.socialnetwork.weconnect.entity.Comment;
 import com.socialnetwork.weconnect.entity.Post;
 import com.socialnetwork.weconnect.entity.User;
-
-import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import java.security.Principal;
@@ -64,8 +61,8 @@ public class PostController {
 	}
 	
 	@DeleteMapping("/post/delete-post/{postId}")
-	public ApiResponse<Boolean> delPostByPostId(@PathVariable @NotNull Integer postId) {
-		return ApiResponse.<Boolean>builder().result(postService.delPostById(postId)).message("Đã xoá thành công").build();
+	public ApiResponse<String> delPostByPostId(@PathVariable @NotNull Integer postId) {
+		return ApiResponse.<String>builder().result(postService.delPostById(postId)).build();
 	}
 	
 	@PutMapping("/post/update-post")

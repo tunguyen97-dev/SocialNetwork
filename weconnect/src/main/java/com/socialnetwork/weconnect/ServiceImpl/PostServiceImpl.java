@@ -9,12 +9,13 @@ import org.springframework.stereotype.Service;
 import com.socialnetwork.weconnect.Service.FilesStorageService;
 import com.socialnetwork.weconnect.Service.PostService;
 import com.socialnetwork.weconnect.dto.request.UpdatePostRequest;
-import com.socialnetwork.weconnect.entity.Comment;
 import com.socialnetwork.weconnect.entity.Post;
 import com.socialnetwork.weconnect.entity.User;
 import com.socialnetwork.weconnect.exception.AppException;
 import com.socialnetwork.weconnect.exception.ErrorCode;
 import com.socialnetwork.weconnect.repository.PostRepository;
+import com.socialnetwork.weconnect.repository.UserRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,6 +26,7 @@ import lombok.experimental.FieldDefaults;
 public class PostServiceImpl implements PostService {
 
 	PostRepository postRepository;
+	UserRepository userRepository;
 	FilesStorageService storageService;
 
 	@Override
@@ -38,43 +40,62 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public List<Post> getAllPostsByUserId(Integer userId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (!userRepository.existsById(user.getId())) {
+			throw new AppException(ErrorCode.USER_NOT_EXISTED);
+		}
+		
 		if (!userId.equals(user.getId())) {
 			throw new AppException(ErrorCode.UNAUTHORIZED);
 		}
-		// kiem tra user có ton tai trong db
-
 		return postRepository.findAllPostsByUserId(userId);
 	}
 
 	@Override
 	public Post getPostById(Integer postId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		// thêm code kiêm tra tồn tại user trong db? => k cần vì có ktra and với post
-		// bên dưới
-		if (!postRepository.existsByIdAndUserId(postId, user.getId())) {
-			throw new AppException(ErrorCode.POST_NOT_EXISTED_OR_USER_NOT_EXISTED);
+		if (!userRepository.existsById(user.getId())) {
+			throw new AppException(ErrorCode.USER_NOT_EXISTED);
 		}
-		return postRepository.findPostById(postId);
+		
+		Post post = postRepository.findPostById(postId);
+		if (post == null) {
+			throw new AppException(ErrorCode.POST_NOT_EXISTED);
+		} else if (!post.getUser().getId().equals(user.getId())) {
+			throw new AppException(ErrorCode.UNAUTHORIZED);
+		}
+		return post;
 	}
 
 	@Override
-	public Boolean delPostById(Integer postId) {
+	public String delPostById(Integer postId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (!postRepository.existsByIdAndUserId(postId, user.getId())) {
-			throw new AppException(ErrorCode.POST_NOT_EXISTED_OR_USER_NOT_EXISTED);
+		if (!postRepository.existsById(postId)) {
+			throw new AppException(ErrorCode.POST_NOT_EXISTED);
+		}
+		
+		Post post = postRepository.findPostById(postId);
+		if (post == null) {
+			throw new AppException(ErrorCode.POST_NOT_EXISTED);
+		} else if (!post.getUser().getId().equals(user.getId())) {
+			throw new AppException(ErrorCode.UNAUTHORIZED);
 		}
 		postRepository.deleteById(postId);
-		return null;
+		return "Đã xoá post thành công";
 	}
 
 	@Override
 	public Post updatePostById(UpdatePostRequest updatePostRequest) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (!postRepository.existsByIdAndUserId(updatePostRequest.getPostId(), user.getId())) {
-			throw new AppException(ErrorCode.POST_NOT_EXISTED_OR_USER_NOT_EXISTED);
+		if (!userRepository.existsById(user.getId())) {
+			throw new AppException(ErrorCode.USER_NOT_EXISTED);
 		}
-
+		
 		Post post = postRepository.findPostById(updatePostRequest.getPostId());
+		if (post == null) {
+			throw new AppException(ErrorCode.POST_NOT_EXISTED);
+		} else if (!post.getUser().getId().equals(user.getId())) {
+			throw new AppException(ErrorCode.UNAUTHORIZED);
+		}
 
 		List<String> newImages = new ArrayList<>(); // danh sách url image request
 		List<String> addedImages = new ArrayList<>(); // Danh sách file mới được thêm
