@@ -42,14 +42,14 @@ public class Post {
 	
 	private String content;
 	
-	@OneToMany(mappedBy = "post")
+	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
 	private List<PostLike> postLikes;
 
 	@ElementCollection
 	@CollectionTable(name = "post_images")
 	private List<String> postImages;
 
-	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
 	@Fetch(FetchMode.SELECT)
 	private List<Comment> postComments;
 	
