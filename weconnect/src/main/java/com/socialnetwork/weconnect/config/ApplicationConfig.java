@@ -1,6 +1,8 @@
 package com.socialnetwork.weconnect.config;
 
 import com.socialnetwork.weconnect.auditing.ApplicationAuditAware;
+import com.socialnetwork.weconnect.exception.AppException;
+import com.socialnetwork.weconnect.exception.ErrorCode;
 import com.socialnetwork.weconnect.repository.UserRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -26,7 +28,7 @@ public class ApplicationConfig {
   @Bean
   public UserDetailsService userDetailsService() {
     return username -> repository.findByEmail(username)
-        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        .orElseThrow(() -> new UsernameNotFoundException("user not exits"));
   }
 
   @Bean

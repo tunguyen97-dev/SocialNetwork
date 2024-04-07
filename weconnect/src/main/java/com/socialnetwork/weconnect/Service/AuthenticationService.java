@@ -92,10 +92,10 @@ public class AuthenticationService {
 			return;
 		}
 		refreshToken = authHeader.substring(7);
-		userEmail = jwtService.extractUsername(refreshToken);
+		userEmail = jwtService.extractUsername(refreshToken, response);
 		if (userEmail != null) {
 			var user = userRepository.findByEmail(userEmail).orElseThrow();
-			if (jwtService.isTokenValid(refreshToken, user)) {
+			if (jwtService.isTokenValid(refreshToken, user, response)) {
 				var accessToken = jwtService.generateToken(user);
 				revokeAllUserTokens(user);
 				saveUserToken(user, accessToken);

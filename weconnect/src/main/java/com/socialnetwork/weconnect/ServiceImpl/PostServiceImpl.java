@@ -14,7 +14,6 @@ import com.socialnetwork.weconnect.entity.User;
 import com.socialnetwork.weconnect.exception.AppException;
 import com.socialnetwork.weconnect.exception.ErrorCode;
 import com.socialnetwork.weconnect.repository.PostRepository;
-import com.socialnetwork.weconnect.repository.UserRepository;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,41 +25,37 @@ import lombok.experimental.FieldDefaults;
 public class PostServiceImpl implements PostService {
 
 	PostRepository postRepository;
-	UserRepository userRepository;
 	FilesStorageService storageService;
 
 	@Override
-	public void savePostToDB(String content, List<String> files, User user) {
+	public void savePostToDB(String content, List<String> files) {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Post post = Post.builder().user(user).content(content).postImages(files).createdAt(sdf.format(new Date()))
-				.isDeleted(false).build();
+		Post post = Post.builder()
+				.user(user)
+				.content(content)
+				.postImages(files)
+				.createdAt(sdf.format(new Date()))
+				.isDeleted(false)
+				.build();
 		postRepository.save(post);
 	}
 
 	@Override
-	public List<Post> getAllPostsByUserId(Integer userId) {
+	public List<Post> getAllPostsByUserId() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (!userRepository.existsById(user.getId())) {
-			throw new AppException(ErrorCode.USER_NOT_EXISTED);
-		}
-		
-		if (!userId.equals(user.getId())) {
-			throw new AppException(ErrorCode.UNAUTHORIZED);
-		}
-		return postRepository.findAllPostsByUserId(userId);
+		return postRepository.findAllPostsByUserId(user.getId());
 	}
 
 	@Override
 	public Post getPostById(Integer postId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (!userRepository.existsById(user.getId())) {
-			throw new AppException(ErrorCode.USER_NOT_EXISTED);
-		}
-		
-		Post post = postRepository.findPostById(postId);
-		if (post == null) {
+		if (!postRepository.existsById(postId)) {
 			throw new AppException(ErrorCode.POST_NOT_EXISTED);
-		} else if (!post.getUser().getId().equals(user.getId())) {
+		}
+
+		Post post = postRepository.findPostById(postId);
+		if (!post.getUser().getId().equals(user.getId())) {
 			throw new AppException(ErrorCode.UNAUTHORIZED);
 		}
 		return post;
@@ -72,11 +67,9 @@ public class PostServiceImpl implements PostService {
 		if (!postRepository.existsById(postId)) {
 			throw new AppException(ErrorCode.POST_NOT_EXISTED);
 		}
-		
+
 		Post post = postRepository.findPostById(postId);
-		if (post == null) {
-			throw new AppException(ErrorCode.POST_NOT_EXISTED);
-		} else if (!post.getUser().getId().equals(user.getId())) {
+		if (!post.getUser().getId().equals(user.getId())) {
 			throw new AppException(ErrorCode.UNAUTHORIZED);
 		}
 		postRepository.deleteById(postId);
@@ -86,14 +79,12 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public Post updatePostById(UpdatePostRequest updatePostRequest) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (!userRepository.existsById(user.getId())) {
-			throw new AppException(ErrorCode.USER_NOT_EXISTED);
-		}
-		
-		Post post = postRepository.findPostById(updatePostRequest.getPostId());
-		if (post == null) {
+		if (!postRepository.existsById(updatePostRequest.getPostId())) {
 			throw new AppException(ErrorCode.POST_NOT_EXISTED);
-		} else if (!post.getUser().getId().equals(user.getId())) {
+		}
+
+		Post post = postRepository.findPostById(updatePostRequest.getPostId());
+		if (!post.getUser().getId().equals(user.getId())) {
 			throw new AppException(ErrorCode.UNAUTHORIZED);
 		}
 

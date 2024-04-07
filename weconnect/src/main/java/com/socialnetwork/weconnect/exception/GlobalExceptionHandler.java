@@ -1,8 +1,15 @@
 package com.socialnetwork.weconnect.exception;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Collections;
+
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +36,16 @@ public class GlobalExceptionHandler {
 
 		apiResponse.setCode(ErrorCode.USER_NOT_EXISTED.getCode());
 		apiResponse.setMessage(ErrorCode.USER_NOT_EXISTED.getMessage());
+
+		return ResponseEntity.badRequest().body(apiResponse);
+	}
+
+	@ExceptionHandler(value = EmptyResultDataAccessException.class)
+	ResponseEntity<ApiResponse> handlingEmptyResultDataAccessException(EmptyResultDataAccessException exception) {
+		ApiResponse apiResponse = new ApiResponse();
+
+		apiResponse.setCode(ErrorCode.RECORD_NOT_EXISTED.getCode());
+		apiResponse.setMessage(ErrorCode.RECORD_NOT_EXISTED.getMessage());
 
 		return ResponseEntity.badRequest().body(apiResponse);
 	}
@@ -61,18 +78,42 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(value = MethodArgumentNotValidException.class)
-	ResponseEntity<ApiResponse> handlingValication(MethodArgumentNotValidException exception) {
-		String enumKey = exception.getFieldError().getDefaultMessage();
+	ResponseEntity<?> handlingValication(MethodArgumentNotValidException exception) {
+		List<ApiResponse> listApiResponses = new ArrayList<>();
 		ErrorCode errorCode = ErrorCode.INVALID_KEY;
-		try {
-			errorCode = ErrorCode.valueOf(enumKey);
-		} catch (IllegalArgumentException e) {
-			// TODO: handle exception log
-		}
-		ApiResponse apiResponse = new ApiResponse();
-		apiResponse.setCode(errorCode.getCode());
-		apiResponse.setMessage(errorCode.getMessage());
+		List<ObjectError> constraintViolation = exception.getBindingResult().getAllErrors();
 
-		return ResponseEntity.badRequest().body(apiResponse);
+		switch (constraintViolation.size()) {
+		case 1:
+			ObjectError objectError = constraintViolation.get(0);
+			try {
+				errorCode = ErrorCode.valueOf(objectError.getDefaultMessage());
+				listApiResponses
+						.add(ApiResponse.builder().code(errorCode.getCode()).message(errorCode.getMessage()).build());
+			} catch (IllegalArgumentException e) {
+				errorCode = ErrorCode.INVALID_KEY;
+				listApiResponses
+						.add(ApiResponse.builder().code(errorCode.getCode()).message(errorCode.getMessage()).build());
+			}
+			break;
+		default:
+			for (ObjectError objectEr : constraintViolation) {
+				try {
+					errorCode = ErrorCode.valueOf(objectEr.getDefaultMessage());
+					listApiResponses.add(
+							ApiResponse.builder().code(errorCode.getCode()).message(errorCode.getMessage()).build());
+				} catch (IllegalArgumentException e) {
+					errorCode = ErrorCode.INVALID_KEY;
+					listApiResponses.clear();
+					listApiResponses.add(
+							ApiResponse.builder().code(errorCode.getCode()).message(errorCode.getMessage()).build());
+
+					break;
+				}
+			}
+			Collections.sort(listApiResponses, Comparator.comparingInt(ApiResponse::getCode));
+			break;
+		}
+		return ResponseEntity.badRequest().body(listApiResponses);
 	}
 }

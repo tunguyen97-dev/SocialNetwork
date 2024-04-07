@@ -6,19 +6,16 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.socialnetwork.weconnect.Service.AuthenticationService;
 import com.socialnetwork.weconnect.dto.request.AuthenticationRequest;
 import com.socialnetwork.weconnect.dto.request.RegisterRequest;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
 import com.socialnetwork.weconnect.dto.response.AuthenticationResponse;
-
 import java.io.IOException;
 
 @RestController

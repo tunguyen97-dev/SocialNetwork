@@ -10,9 +10,9 @@ import com.socialnetwork.weconnect.entity.User;
 @Service
 public interface PostService {
 
-	public void savePostToDB(String content, List<String> file, User userId);
+	public void savePostToDB(String content, List<String> file);
 
-	public List<Post> getAllPostsByUserId(Integer userId);
+	public List<Post> getAllPostsByUserId();
 	
 	public Post getPostById(Integer postId);
 

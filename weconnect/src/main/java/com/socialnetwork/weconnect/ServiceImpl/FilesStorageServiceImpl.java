@@ -5,24 +5,19 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Principal;
 import java.util.UUID;
 import java.util.stream.Stream;
-
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.socialnetwork.weconnect.Service.FilesStorageService;
 import com.socialnetwork.weconnect.entity.User;
 import com.socialnetwork.weconnect.exception.AppException;
 import com.socialnetwork.weconnect.exception.ErrorCode;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
