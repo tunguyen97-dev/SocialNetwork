@@ -33,7 +33,7 @@ public class FriendServiceImpl implements FriendService {
 	public String addFriendRequest(Integer receiverId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (receiverId.equals(user.getId())) {
-			throw new AppException(ErrorCode.SEND_FRIEND_FAILED);
+			throw new AppException(ErrorCode.DUPLICATE_ID);
 		} else if (friendRequestRepository.existsBySenderIdAndReceiverIdOrReceiverIdAndSenderId(user.getId(), receiverId, user.getId(), receiverId)) {
 			throw new AppException(ErrorCode.SEND_FRIEND_FAILED);
 		}
@@ -44,7 +44,7 @@ public class FriendServiceImpl implements FriendService {
         		.createdAt(null)
         		.build();
         friendRequest = friendRequestRepository.save(friendRequest);
-		return "Đã gửi lời mời kết bạn thành công";
+		return "Friend request sent successfully";
 	}
 	
 	@Transactional
@@ -52,7 +52,7 @@ public class FriendServiceImpl implements FriendService {
 	public String cancelFriendRequest(Integer receiverId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (receiverId.equals(user.getId())) {
-			throw new AppException(ErrorCode.CANCEL_FRIEND_FAILED);
+			throw new AppException(ErrorCode.DUPLICATE_ID);
 		} else if (!friendRequestRepository.existsBySenderIdAndReceiverId(user.getId(), receiverId)) {
 			throw new AppException(ErrorCode.CANCEL_FRIEND_FAILED);
 		}
@@ -61,7 +61,7 @@ public class FriendServiceImpl implements FriendService {
         if (resultCancel != 1) {
         	throw new AppException(ErrorCode.CANCEL_FRIEND_FAILED);
 		}
-		return "Đã huỷ lời mời kết bạn thành công";
+		return "Friend request cancelled successfully";
 	}
 	
 	@Transactional
@@ -70,8 +70,7 @@ public class FriendServiceImpl implements FriendService {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (senderId.equals(user.getId())) {
-			throw new AppException(ErrorCode.ACCEPT_FRIEND_FAILED);
-			// nếu k tồn tại request thì k thể accept: Nếu tồn tại đồng nghĩa user sender cũng tồn tại
+			throw new AppException(ErrorCode.DUPLICATE_ID);
 		} else if (!friendRequestRepository.existsBySenderIdAndReceiverId(senderId, user.getId())) {
 			throw new AppException(ErrorCode.ACCEPT_FRIEND_FAILED);
 		} 
@@ -81,6 +80,7 @@ public class FriendServiceImpl implements FriendService {
 				.user2(userRepository.findUserById(senderId))
 				.createdAt(sdf.format(new Date()))
 				.build();
+		
 		friend = friendRepository.save(friend);
 		if (friend == null) {
 			throw new AppException(ErrorCode.ACCEPT_FRIEND_FAILED);
@@ -89,7 +89,7 @@ public class FriendServiceImpl implements FriendService {
         if (resultCancel != 1) {
         	throw new AppException(ErrorCode.ACCEPT_FRIEND_FAILED);
 		}
-		return "Đã chấp nhận lời mời kết bạn thành công";
+		return "Friend request accepted successfully";
 	}
 	
 }

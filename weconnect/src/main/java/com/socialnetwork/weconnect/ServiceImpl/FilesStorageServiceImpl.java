@@ -12,6 +12,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.socialnetwork.weconnect.Service.FilesStorageService;
@@ -37,7 +38,8 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 			throw new RuntimeException("Could not initialize folder for upload!");
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public String saveTosServer(MultipartFile file, String userName) {
 
@@ -62,7 +64,8 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 			throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public boolean delTosServer(String fileName, String userName) {
 		Path path = Paths.get(fileName);
@@ -81,7 +84,8 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 			throw new AppException(ErrorCode.URL_INVALID);
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public String load(String filename) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -98,12 +102,14 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 			throw new AppException(ErrorCode.URL_INVALID);
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public void deleteAll() {
 		FileSystemUtils.deleteRecursively(root.toFile());
 	}
 
+	@Transactional
 	@Override
 	public Stream<Path> loadAllByUserName() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -118,7 +124,7 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 			throw new RuntimeException("Could not load the files!");
 		}
 	}
-
+	
 	@Override
 	public String getUniqueFilename(String filename) {
 		// Định dạng tên file mới, có thể sử dụng timestamp hoặc số ngẫu nhiên để đảm
@@ -143,7 +149,8 @@ public class FilesStorageServiceImpl implements FilesStorageService {
 		}
 		return false;
 	}
-
+	
+	@Transactional
 	@Override
 	public String saveToFileServer(String filePath, String userName) {
 		Path userDirectory = this.root.resolve(userName);

@@ -1,36 +1,21 @@
 package com.socialnetwork.weconnect.Service;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.security.Key;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.socialnetwork.weconnect.dto.response.ApiResponse;
 import com.socialnetwork.weconnect.exception.ErrorCode;
 
 @Service

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Collections;
-
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
-
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
 
 @ControllerAdvice
@@ -64,8 +62,10 @@ public class GlobalExceptionHandler {
 	ResponseEntity<ApiResponse> handlingAppException(AppException exception) {
 		ErrorCode errorCode = exception.getErrorCode();
 		ApiResponse apiResponse = new ApiResponse();
+		
 		apiResponse.setCode(errorCode.getCode());
 		apiResponse.setMessage(errorCode.getMessage());
+		
 		return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
 	}
 

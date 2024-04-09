@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialnetwork.weconnect.dto.request.AuthenticationRequest;
 import com.socialnetwork.weconnect.dto.request.RegisterRequest;
 import com.socialnetwork.weconnect.dto.response.AuthenticationResponse;
+import com.socialnetwork.weconnect.entity.Otp;
 import com.socialnetwork.weconnect.entity.User;
 import com.socialnetwork.weconnect.exception.AppException;
 import com.socialnetwork.weconnect.exception.ErrorCode;
+import com.socialnetwork.weconnect.repository.OtpRepository;
 import com.socialnetwork.weconnect.repository.UserRepository;
 import com.socialnetwork.weconnect.token.Token;
 import com.socialnetwork.weconnect.token.TokenRepository;
@@ -21,6 +23,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.socialnetwork.weconnect.Service.JwtService;
@@ -36,17 +39,15 @@ public class AuthenticationService {
 	PasswordEncoder passwordEncoder;
 	JwtService jwtService;
 	AuthenticationManager authenticationManager;
+	OtpRepository otpRepository;
 
 	public AuthenticationResponse register(RegisterRequest request) {
 		Optional<User> userCheck = userRepository.findByEmail(request.getEmail());
 		if (userCheck.isPresent()) {
 			throw new AppException(ErrorCode.USER_EXITED);
 		}
-		var user = User.builder()
-				.name(request.getUserName())
-				.email(request.getEmail())
-				.password(passwordEncoder.encode(request.getPassword()))
-				.role(request.getRole()).build();
+		var user = User.builder().name(request.getUserName()).email(request.getEmail())
+				.password(passwordEncoder.encode(request.getPassword())).role(request.getRole()).build();
 		var savedUser = userRepository.save(user);
 		var jwtToken = jwtService.generateToken(user);
 		var refreshToken = jwtService.generateRefreshToken(user);
@@ -105,4 +106,25 @@ public class AuthenticationService {
 			}
 		}
 	}
+
+	public AuthenticationResponse verifyOtp(int optRequest, String email) {
+		Optional<User> optinalUser= userRepository.findByEmail(email);
+		if (!optinalUser.isPresent()) {
+			throw new AppException(ErrorCode.USER_NOT_EXISTED);
+		}
+		Optional<Otp> optionalOtp = otpRepository.findByUserId(optinalUser.get().getId());
+		if (optionalOtp.isPresent()) {
+			if (optRequest == optionalOtp.get().getOtpNumber()) {
+				var jwtToken = jwtService.generateToken(optinalUser.get());
+				var refreshToken = jwtService.generateRefreshToken(optinalUser.get());
+				revokeAllUserTokens(optinalUser.get());
+				saveUserToken(optinalUser.get(), jwtToken);
+				return AuthenticationResponse.builder().accessToken(jwtToken).refreshToken(refreshToken).build();
+			} else {
+				throw new AppException(ErrorCode.OTP_INVALID);
+			}
+		}
+			throw new AppException(ErrorCode.OTP_NOT_FOUND);
+	}
+
 }

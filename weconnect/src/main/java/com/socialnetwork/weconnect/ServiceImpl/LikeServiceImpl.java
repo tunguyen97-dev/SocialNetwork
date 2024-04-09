@@ -29,26 +29,24 @@ public class LikeServiceImpl implements LikeService {
 	public String likePostByPostId(Integer postId) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
 		if (!postRepository.existsById(postId)) {
 			throw new AppException(ErrorCode.POST_NOT_EXISTED);
 		}
-
 	    PostLike existingLike = likeRepository.findByPostIdAndUserId(postId, user.getId());
 	    if (existingLike != null) {
-	        likeRepository.deleteById(existingLike.getId());;
-	        return "Đã unlike bài viết";
+	        likeRepository.deleteById(existingLike.getId());
+	        return "Successfully unliked the post";
 	    } else {
 	        PostLike postLike = PostLike.builder()
 	            .createdAt(sdf.format(new Date()))
 	            .post(postRepository.findPostById(postId))
 	            .user(user)
 	            .build();
-	        PostLike postLikeResult = likeRepository.save(postLike);
-	        if (postLikeResult == null) {
+	        postLike = likeRepository.save(postLike);
+	        if (postLike == null) {
 	        	throw new AppException(ErrorCode.LIKE_FAILED);
 	        }
-	        return "Đã like thành công";
+	        return "Successfully liked the post";
 	    }
-}
+	}
 }

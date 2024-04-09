@@ -1,7 +1,6 @@
 package com.socialnetwork.weconnect.Service;
 
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 import com.socialnetwork.weconnect.dto.request.CommentRequest;
 import com.socialnetwork.weconnect.dto.request.UpdateCommentRequest;

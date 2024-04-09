@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.socialnetwork.weconnect.Service.FilesStorageService;
 import com.socialnetwork.weconnect.Service.PostService;
 import com.socialnetwork.weconnect.dto.request.UpdatePostRequest;
@@ -14,7 +15,6 @@ import com.socialnetwork.weconnect.entity.User;
 import com.socialnetwork.weconnect.exception.AppException;
 import com.socialnetwork.weconnect.exception.ErrorCode;
 import com.socialnetwork.weconnect.repository.PostRepository;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +27,7 @@ public class PostServiceImpl implements PostService {
 	PostRepository postRepository;
 	FilesStorageService storageService;
 
+	@Transactional
 	@Override
 	public void savePostToDB(String content, List<String> files) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -40,42 +41,41 @@ public class PostServiceImpl implements PostService {
 				.build();
 		postRepository.save(post);
 	}
-
+	
+	@Transactional
 	@Override
 	public List<Post> getAllPostsByUserId() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return postRepository.findAllPostsByUserId(user.getId());
 	}
-
+	
+	@Transactional
 	@Override
 	public Post getPostById(Integer postId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (!postRepository.existsById(postId)) {
-			throw new AppException(ErrorCode.POST_NOT_EXISTED);
-		}
-
 		Post post = postRepository.findPostById(postId);
-		if (!post.getUser().getId().equals(user.getId())) {
+		if (post != null && !post.getUser().getId().equals(user.getId())) {
 			throw new AppException(ErrorCode.UNAUTHORIZED);
 		}
 		return post;
 	}
-
+	
+	@Transactional
 	@Override
 	public String delPostById(Integer postId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (!postRepository.existsById(postId)) {
 			throw new AppException(ErrorCode.POST_NOT_EXISTED);
 		}
-
 		Post post = postRepository.findPostById(postId);
 		if (!post.getUser().getId().equals(user.getId())) {
 			throw new AppException(ErrorCode.UNAUTHORIZED);
 		}
 		postRepository.deleteById(postId);
-		return "Đã xoá post thành công";
+		return "Successfully deleted the post";
 	}
-
+	
+	@Transactional
 	@Override
 	public Post updatePostById(UpdatePostRequest updatePostRequest) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

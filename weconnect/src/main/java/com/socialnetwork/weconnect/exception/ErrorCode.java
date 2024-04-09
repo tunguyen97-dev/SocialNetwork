@@ -6,14 +6,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
-//@FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 public enum ErrorCode {
-	INVALID_KEY(1001, "Sai key enum", HttpStatus.BAD_REQUEST),
+	INVALID_KEY(1001, "Invalid enum key", HttpStatus.BAD_REQUEST),
 	USER_EXITED(1002, "User existed", HttpStatus.BAD_REQUEST),
 	UPLOAD_IMAGE_INVALID(1007, "One or more files are too large!", HttpStatus.BAD_REQUEST),
 	EMAIL_NOT_EMPTY(10, "Email not empty", HttpStatus.BAD_REQUEST),
-	DATE_FORMAT_INVALID(9, " format date does not match YYYY-MM-DD", HttpStatus.BAD_REQUEST),
+	DATE_FORMAT_INVALID(9, "Format date does not match YYYY-MM-DD", HttpStatus.BAD_REQUEST),
 	USERNAME_INVALID(1003, "Username must be at least 3 characters", HttpStatus.BAD_REQUEST),
 	PASSWORD_INVALID(1004, "Password must be at least 8 characters", HttpStatus.BAD_REQUEST), 
 	USER_NOT_EXISTED(1005, "User not existed", HttpStatus.NOT_FOUND),
@@ -37,6 +36,9 @@ public enum ErrorCode {
 	LIST_COMMENT_EMPTY(1016,"There are no comments for postId", HttpStatus.OK),
 	TOKEN_NOT_FOUND(1015,"Token not found", HttpStatus.NOT_FOUND),
 	INVALID_SIGNATURE(1024,"The JWT signature does not match the locally computed signature", HttpStatus.BAD_REQUEST),
+	DUPLICATE_ID(1025,"Cannot friend yourself or already accepted/declined friend request from yourself.", HttpStatus.BAD_REQUEST),
+	OTP_INVALID(1026, "OTP_INVALID", HttpStatus.BAD_REQUEST),
+	OTP_NOT_FOUND(1027,"OTP not found", HttpStatus.NOT_FOUND),
 	TOKEN_EMPTY(1023,"Token is empty", HttpStatus.BAD_REQUEST);
 
 	int code;

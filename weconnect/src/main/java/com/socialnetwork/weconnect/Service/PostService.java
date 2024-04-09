@@ -2,10 +2,8 @@ package com.socialnetwork.weconnect.Service;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-
 import com.socialnetwork.weconnect.dto.request.UpdatePostRequest;
 import com.socialnetwork.weconnect.entity.Post;
-import com.socialnetwork.weconnect.entity.User;
 
 @Service
 public interface PostService {

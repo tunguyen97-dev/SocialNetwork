@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.socialnetwork.weconnect.Service.CommentService;
 import com.socialnetwork.weconnect.dto.request.CommentRequest;
 import com.socialnetwork.weconnect.dto.request.UpdateCommentRequest;
@@ -28,6 +30,7 @@ public class CommentServiceImpl implements CommentService {
 	CommentRepositoty commentRepository;
 	PostRepository postRepository;
 
+	@Transactional
 	@Override
 	public Comment getCommentById(Integer commentId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -42,35 +45,37 @@ public class CommentServiceImpl implements CommentService {
 			throw new AppException(ErrorCode.COMMENT_NOT_EXISTED);
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public Comment addComment(CommentRequest newcomment) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (!postRepository.existsById(newcomment.getPostId())) {
+		Optional<Post> optionalPost = postRepository.findById(newcomment.getPostId());
+		if (optionalPost.isPresent()) {
+			Post post = optionalPost.get();
+			Comment comment = Comment.builder()
+					.content(newcomment.getContent())
+					.post(post)
+					.user(user)
+					.createdAt(sdf.format(new Date()))
+					.isDeleted(false)
+					.build();
+			Comment commentResult = commentRepository.save(comment);
+			if (commentResult == null) {
+				throw new AppException(ErrorCode.COMMENT_FAILED);
+			}
+			return commentResult;
+		} else {
 			throw new AppException(ErrorCode.POST_NOT_EXISTED);
 		}
-
-		Post post = postRepository.findPostById(newcomment.getPostId());
-		Comment comment = Comment.builder()
-				.content(newcomment.getContent())
-				.post(post)
-				.user(user)
-				.createdAt(sdf.format(new Date()))
-				.isDeleted(false)
-				.build();
-		Comment commentResult = commentRepository.save(comment);
-		if (commentResult == null) {
-			throw new AppException(ErrorCode.COMMENT_FAILED);
-		}
-		return commentResult;
 	}
-
+	
+	@Transactional
 	@Override
 	public Comment updateCommentById(UpdateCommentRequest updateCommentRequest) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
 		Optional<Comment> optionalComment = commentRepository.findById(updateCommentRequest.getCommentId());
 		if (optionalComment.isPresent()) {
 			Comment comment = optionalComment.get();
@@ -80,21 +85,22 @@ public class CommentServiceImpl implements CommentService {
 			comment.setContent(updateCommentRequest.getContent());
 			comment.setUpdatedAt(sdf.format(new Date()));
 			comment.setIsDeleted(false);
+			
 			Comment commentResult = commentRepository.save(comment);
 			if (commentResult == null) {
 				throw new AppException(ErrorCode.UPDATE_COMMENT_FAILED);
 			}
 			return commentResult;
-			
+
 		} else {
 			throw new AppException(ErrorCode.COMMENT_NOT_EXISTED);
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public String delCommentById(Integer commentId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
 		Optional<Comment> optionalComment = commentRepository.findById(commentId);
 		if (optionalComment.isPresent()) {
 			Comment comment = optionalComment.get();
@@ -107,7 +113,8 @@ public class CommentServiceImpl implements CommentService {
 			throw new AppException(ErrorCode.COMMENT_NOT_EXISTED);
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public String lockCommentById(Integer commentId) {
 		Optional<Comment> optionalComment = commentRepository.findById(commentId);
@@ -123,21 +130,20 @@ public class CommentServiceImpl implements CommentService {
 			throw new AppException(ErrorCode.COMMENT_NOT_EXISTED);
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public List<Comment> getAllCommentsByPostId(Integer postId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
 		Optional<Post> optionalPost = postRepository.findById(postId);
-		Post post = new Post();
 		if (optionalPost.isPresent()) {
-			post = optionalPost.get();
-		    if (!post.getUser().getId().equals(user.getId())) {
+			Post post = optionalPost.get();
+			if (!post.getUser().getId().equals(user.getId())) {
 				throw new AppException(ErrorCode.UNAUTHORIZED);
 			}
+			return post.getPostComments();
 		} else {
 			throw new AppException(ErrorCode.POST_NOT_EXISTED);
 		}
-		return post.getPostComments();
 	}
 }
