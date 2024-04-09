@@ -74,17 +74,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		filterChain.doFilter(request, response);
 	}
 
-	private String extractTokenFromRequest(HttpServletRequest request) {
-		// Code để lấy token từ header của request, bạn có thể thay đổi tùy theo cách
-		// bạn lưu trữ token
-		// Trong ví dụ này, tôi giả sử token được gửi dưới dạng header "Authorization"
-		String token = request.getHeader("Authorization");
-
-		// Trong trường hợp token không nằm trong header "Authorization"
-		// Bạn có thể kiểm tra các nơi khác như cookie, tham số truy vấn, v.v.
-		return token;
-	}
-
 	private void handleNullJwt(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		// Xử lý khi JWT là null, ví dụ trả về mã lỗi hoặc thông báo lỗi
 		ErrorCode errorCode = ErrorCode.TOKEN_EMPTY;

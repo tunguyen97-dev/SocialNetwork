@@ -90,8 +90,6 @@ public class JwtService {
 		return claims;
 	}
 
-
-
 	// Hàm để lấy key để ký JWT token
 	private Key getSignInKey() {
 		byte[] keyBytes = Decoders.BASE64.decode(secretKey);

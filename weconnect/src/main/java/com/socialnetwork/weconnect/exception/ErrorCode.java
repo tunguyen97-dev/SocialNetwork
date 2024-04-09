@@ -35,10 +35,12 @@ public enum ErrorCode {
 	COMMENT_NOT_EXISTED(1014,"Comment not existed", HttpStatus.NOT_FOUND),
 	LIST_COMMENT_EMPTY(1016,"There are no comments for postId", HttpStatus.OK),
 	TOKEN_NOT_FOUND(1015,"Token not found", HttpStatus.NOT_FOUND),
+	TOKEN_INVALID(1028,"Token invalid", HttpStatus.BAD_REQUEST),
 	INVALID_SIGNATURE(1024,"The JWT signature does not match the locally computed signature", HttpStatus.BAD_REQUEST),
 	DUPLICATE_ID(1025,"Cannot friend yourself or already accepted/declined friend request from yourself.", HttpStatus.BAD_REQUEST),
 	OTP_INVALID(1026, "OTP_INVALID", HttpStatus.BAD_REQUEST),
 	OTP_NOT_FOUND(1027,"OTP not found", HttpStatus.NOT_FOUND),
+	PASSWORD_CHANGE_FAILED(1028, "Password change unsuccessful", HttpStatus.BAD_REQUEST),
 	TOKEN_EMPTY(1023,"Token is empty", HttpStatus.BAD_REQUEST);
 
 	int code;

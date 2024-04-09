@@ -2,6 +2,8 @@ package com.socialnetwork.weconnect.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialnetwork.weconnect.dto.request.AuthenticationRequest;
+import com.socialnetwork.weconnect.dto.request.ChangePasswordRequest;
+import com.socialnetwork.weconnect.dto.request.EmailRequest;
 import com.socialnetwork.weconnect.dto.request.RegisterRequest;
 import com.socialnetwork.weconnect.dto.response.AuthenticationResponse;
 import com.socialnetwork.weconnect.entity.Otp;
@@ -13,20 +15,19 @@ import com.socialnetwork.weconnect.repository.UserRepository;
 import com.socialnetwork.weconnect.token.Token;
 import com.socialnetwork.weconnect.token.TokenRepository;
 import com.socialnetwork.weconnect.token.TokenType;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.socialnetwork.weconnect.Service.JwtService;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.IOException;
 import java.util.Optional;
 
@@ -68,13 +69,13 @@ public class AuthenticationService {
 		return AuthenticationResponse.builder().accessToken(jwtToken).refreshToken(refreshToken).build();
 	}
 
-	private void saveUserToken(User user, String jwtToken) {
+	public void saveUserToken(User user, String jwtToken) {
 		var token = Token.builder().user(user).token(jwtToken).tokenType(TokenType.BEARER).expired(false).revoked(false)
 				.build();
 		tokenRepository.save(token);
 	}
 
-	private void revokeAllUserTokens(User user) {
+	public void revokeAllUserTokens(User user) {
 		var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
 		if (validUserTokens.isEmpty())
 			return;
@@ -108,7 +109,7 @@ public class AuthenticationService {
 	}
 
 	public AuthenticationResponse verifyOtp(int optRequest, String email) {
-		Optional<User> optinalUser= userRepository.findByEmail(email);
+		Optional<User> optinalUser = userRepository.findByEmail(email);
 		if (!optinalUser.isPresent()) {
 			throw new AppException(ErrorCode.USER_NOT_EXISTED);
 		}
@@ -124,7 +125,59 @@ public class AuthenticationService {
 				throw new AppException(ErrorCode.OTP_INVALID);
 			}
 		}
-			throw new AppException(ErrorCode.OTP_NOT_FOUND);
+		throw new AppException(ErrorCode.OTP_NOT_FOUND);
+	}
+
+	// trường hợp dag k login và dag login va quen mk
+	public AuthenticationResponse forgotPassword(EmailRequest emailRequest) {
+		Optional<User> optinalUser = userRepository.findByEmail(emailRequest.getEmail());
+		if (!optinalUser.isPresent()) {
+			throw new AppException(ErrorCode.USER_NOT_EXISTED);
+		}
+		var jwtToken = jwtService.generateToken(optinalUser.get());
+		var refreshToken = jwtService.generateRefreshToken(optinalUser.get());
+		revokeAllUserTokens(optinalUser.get());
+		saveUserToken(optinalUser.get(), jwtToken);
+		return AuthenticationResponse.builder().accessToken(jwtToken).refreshToken(refreshToken).build();
+	}
+
+	public String changePassword(ChangePasswordRequest changePasswordRequest) {
+		// valid token
+		var isTokenValid = tokenRepository.findByToken(changePasswordRequest.getToken())
+				.map(t -> !t.isExpired() && !t.isRevoked()).orElse(false);
+		if (!isTokenValid) {
+			throw new AppException(ErrorCode.TOKEN_INVALID);
+		}
+		User user = tokenRepository.findUserByToken(changePasswordRequest.getToken());
+		// check if the current password is correct
+		if (!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(), user.getPassword())) {
+			throw new IllegalStateException("Wrong password");
+		}
+		// check if the two new passwords are the same
+		if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmationPassword())) {
+			throw new IllegalStateException("Password are not the same");
+		}
+		// update the password
+		user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+		user = userRepository.save(user);
+		if (user == null) {
+			throw new AppException(ErrorCode.PASSWORD_CHANGE_FAILED);
+		}
+		return "Password changed successfully";
+	}
+	
+	@Transactional
+	public String deleteUser() {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		boolean existUser= userRepository.existsById(user.getId());
+		if (!existUser) {
+			throw new AppException(ErrorCode.USER_NOT_EXISTED);
+		}
+		int resultDelete = userRepository.deleteUserById(user.getId());
+		if (resultDelete != 1) {
+			return "Xử lý xoá không thành công";
+		}
+		return "Xử lý xoá thành công";
 	}
 
 }

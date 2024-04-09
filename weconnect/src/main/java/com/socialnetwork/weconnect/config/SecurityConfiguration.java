@@ -9,11 +9,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
-
 import static com.socialnetwork.weconnect.config.Permission.ADMIN_CREATE;
 import static com.socialnetwork.weconnect.config.Permission.ADMIN_DELETE;
 import static com.socialnetwork.weconnect.config.Permission.ADMIN_READ;
@@ -50,7 +48,6 @@ public class SecurityConfiguration {
             "/swagger-ui.html"};
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
-//    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final LogoutHandler logoutHandler;
 
     @Bean
