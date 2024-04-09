@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.beans.Transient;
 import java.io.IOException;
 import java.security.Security;
+import java.util.List;
 
 import jakarta.transaction.TransactionScoped;
 import jakarta.transaction.Transactional;
@@ -30,6 +31,9 @@ import com.socialnetwork.weconnect.dto.response.ApiResponse;
 import com.socialnetwork.weconnect.exception.ErrorCode;
 import com.socialnetwork.weconnect.token.TokenRepository;
 
+import ch.qos.logback.core.joran.conditional.IfAction;
+import io.jsonwebtoken.lang.Arrays;
+
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -42,18 +46,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 			@NonNull FilterChain filterChain) throws ServletException, IOException {
 
-		if (request.getServletPath().contains("/api/v1/auth")) {
+		if (request.getServletPath().contains("/api/v1/auth")
+				|| request.getServletPath().contains("/swagger-ui")
+				|| request.getServletPath().contains("/configuration")
+				|| request.getServletPath().contains("/webjars")
+				|| request.getServletPath().contains("/swagger-resources")
+				|| request.getServletPath().contains("/v2/api-docs")
+				|| request.getServletPath().contains("/v3/api-docs")) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 		final String authHeader = request.getHeader("Authorization");
-		if (authHeader == null) {
-			handleNullJwt(request, response);
-		}
 
 		final String jwt;
 		final String userEmail;
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			response.setStatus(ErrorCode.TOKEN_EMPTY.getCode());
 			filterChain.doFilter(request, response);
 			return;
 		}
@@ -74,18 +82,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		filterChain.doFilter(request, response);
 	}
 
-	private void handleNullJwt(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		// Xử lý khi JWT là null, ví dụ trả về mã lỗi hoặc thông báo lỗi
-		ErrorCode errorCode = ErrorCode.TOKEN_EMPTY;
-		response.setStatus(errorCode.getCode());
-		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-		ApiResponse<?> apiResponse = ApiResponse.builder().code(errorCode.getCode()).message(errorCode.getMessage())
-				.build();
-
-		ObjectMapper objectMapper = new ObjectMapper();
-
-		response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
-
-	}
 }

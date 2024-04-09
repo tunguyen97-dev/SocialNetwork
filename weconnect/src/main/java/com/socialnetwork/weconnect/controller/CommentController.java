@@ -16,14 +16,16 @@ import com.socialnetwork.weconnect.dto.request.UpdateCommentRequest;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
 import com.socialnetwork.weconnect.entity.Comment;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/comments")
 public class CommentController {
 
-	private final CommentService commentService;
+	CommentService commentService;
 
 	@DeleteMapping("/comment/delete-comment/{commentId}")
 	public ApiResponse<String> delCommentByCommentId(@PathVariable @NotNull Integer commentId) {

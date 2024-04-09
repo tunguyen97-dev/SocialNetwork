@@ -20,27 +20,33 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
 		int errorCode = response.getStatus();
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		if (errorCode == ErrorCode.TOKEN_EMPTY.getCode()) {
-			response.setStatus(ErrorCode.TOKEN_EMPTY.getStatusCode().value());
+			ErrorCode errorCd = ErrorCode.TOKEN_EMPTY;
+			response.setStatus(errorCd.getStatusCode().value());
+			ApiResponse<?> apiResponse = ApiResponse.builder().code(errorCd.getCode()).message(errorCd.getMessage())
+					.build();
+			ObjectMapper objectMapper = new ObjectMapper();
+			response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
 			response.flushBuffer();
 			return;
 		} else if (errorCode == ErrorCode.INVALID_SIGNATURE.getCode()) {
 			response.setStatus(ErrorCode.INVALID_SIGNATURE.getStatusCode().value());
 			ErrorCode errorCd = ErrorCode.INVALID_SIGNATURE;
-			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 			ApiResponse<?> apiResponse = ApiResponse.builder().code(errorCd.getCode()).message(errorCd.getMessage())
 					.build();
 			ObjectMapper objectMapper = new ObjectMapper();
 			response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+			response.flushBuffer();
 			return;
 		} else if (errorCode == ErrorCode.TOKEN_NOT_FOUND.getCode()) {
 			ErrorCode errorCd = ErrorCode.TOKEN_NOT_FOUND;
 			response.setStatus(errorCd.getStatusCode().value());
-			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 			ApiResponse<?> apiResponse = ApiResponse.builder().code(errorCd.getCode()).message(errorCd.getMessage())
 					.build();
 			ObjectMapper objectMapper = new ObjectMapper();
 			response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+			response.flushBuffer();
 			return;
 		}
 		response.reset();

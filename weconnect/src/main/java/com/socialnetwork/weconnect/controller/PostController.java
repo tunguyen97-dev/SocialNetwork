@@ -7,7 +7,10 @@ import com.socialnetwork.weconnect.dto.response.ApiResponse;
 import com.socialnetwork.weconnect.entity.Post;
 import com.socialnetwork.weconnect.entity.User;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,8 +33,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/posts")
 public class PostController {
 	
-	private final FilesStorageService storageService;
-	private final PostService postService;
+	FilesStorageService storageService;
+	PostService postService;
 
 	@PostMapping(value = "/add-post", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ApiResponse<List<String>> uploadPost(@RequestPart("content") String content,

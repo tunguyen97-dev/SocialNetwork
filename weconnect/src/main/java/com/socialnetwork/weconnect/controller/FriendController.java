@@ -10,14 +10,16 @@ import com.socialnetwork.weconnect.Service.FriendService;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/friends")
 public class FriendController {
 
-	private final FriendService friendService;
+	FriendService friendService;
 
 	@PostMapping("/friend/add-friend/{receiverId}")
 	public ApiResponse<String> addFriend(@PathVariable @NotNull Integer receiverId) {

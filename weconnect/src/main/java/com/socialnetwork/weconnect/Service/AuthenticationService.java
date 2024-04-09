@@ -1,9 +1,9 @@
 package com.socialnetwork.weconnect.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.socialnetwork.weconnect.dto.request.AuthenticationRequest;
 import com.socialnetwork.weconnect.dto.request.ChangePasswordRequest;
 import com.socialnetwork.weconnect.dto.request.EmailRequest;
+import com.socialnetwork.weconnect.dto.request.LoginRequest;
 import com.socialnetwork.weconnect.dto.request.RegisterRequest;
 import com.socialnetwork.weconnect.dto.response.AuthenticationResponse;
 import com.socialnetwork.weconnect.entity.Otp;
@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +58,7 @@ public class AuthenticationService {
 		return AuthenticationResponse.builder().accessToken(jwtToken).refreshToken(refreshToken).build();
 	}
 
-	public AuthenticationResponse authenticate(AuthenticationRequest request) {
+	public AuthenticationResponse authenticate(LoginRequest request) {
 		// xac thuc thong tin nguoi dung
 		authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -165,11 +166,11 @@ public class AuthenticationService {
 		}
 		return "Password changed successfully";
 	}
-	
+
 	@Transactional
 	public String deleteUser() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		boolean existUser= userRepository.existsById(user.getId());
+		boolean existUser = userRepository.existsById(user.getId());
 		if (!existUser) {
 			throw new AppException(ErrorCode.USER_NOT_EXISTED);
 		}
@@ -178,6 +179,20 @@ public class AuthenticationService {
 			return "Xử lý xoá không thành công";
 		}
 		return "Xử lý xoá thành công";
+	}
+
+	public int login(LoginRequest loginRequest) {
+		var user = userRepository.findByEmail(loginRequest.getEmail())
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+//		if (condition) {
+//			
+//		}
+return 1;
+	}
+
+	public String generatorOtpNumber() {
+		UUID uuid = UUID.randomUUID();
+		return uuid.toString().replaceAll("-", "").substring(0, 6);
 	}
 
 }

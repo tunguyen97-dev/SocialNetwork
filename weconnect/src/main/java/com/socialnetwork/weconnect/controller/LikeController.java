@@ -7,14 +7,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.socialnetwork.weconnect.Service.LikeService;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/likes")
 public class LikeController {
 
-	private final LikeService likeService;
+	LikeService likeService;
 	
 	@PostMapping("/{postId}/like")
 	public ApiResponse<String> likePostByPostId(@PathVariable @NotNull Integer postId) {
