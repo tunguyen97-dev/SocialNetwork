@@ -38,6 +38,10 @@ public class User implements UserDetails {
 	private String name;
 	private String email;
 	private String password;
+	private String avataUrl;
+	private String profession;
+	private String birthday;
+	private String address;
 
 	@Enumerated(EnumType.STRING)
 	Role role;

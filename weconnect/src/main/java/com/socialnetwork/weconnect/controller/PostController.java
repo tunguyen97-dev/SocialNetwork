@@ -85,4 +85,11 @@ public class PostController {
 				.result(postService.updatePostById(updatePostRequest))
 				.build();
 	}
+	
+	@GetMapping("/post/timeLines")
+	public ApiResponse<List<Post>> getListTimeLine() {
+		return ApiResponse.<List<Post>>builder()
+				.result(postService.getListTimeLine())
+				.build();
+	}
 }

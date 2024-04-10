@@ -1,4 +1,4 @@
-package com.socialnetwork.weconnect.ServiceImpl;
+ package com.socialnetwork.weconnect.ServiceImpl;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

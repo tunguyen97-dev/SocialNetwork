@@ -136,4 +136,10 @@ public class PostServiceImpl implements PostService {
 		post.setUpdatedAt(sdf.format(new Date()));
 		return postRepository.save(post);
 	}
+
+	@Override
+	public List<Post> getListTimeLine() {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return postRepository.getTimeLineByUserId(user.getId());
+	}
 }

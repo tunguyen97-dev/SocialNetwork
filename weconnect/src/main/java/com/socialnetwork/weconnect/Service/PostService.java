@@ -17,5 +17,7 @@ public interface PostService {
 	public String delPostById(Integer postId);
 
 	public Post updatePostById(UpdatePostRequest updatePostRequest);
+	
+	List<Post> getListTimeLine();
 
 }
