@@ -41,6 +41,8 @@ public enum ErrorCode {
 	OTP_INVALID(1026, "OTP_INVALID", HttpStatus.BAD_REQUEST),
 	OTP_NOT_FOUND(1027,"OTP not found", HttpStatus.NOT_FOUND),
 	PASSWORD_CHANGE_FAILED(1028, "Password change unsuccessful", HttpStatus.BAD_REQUEST),
+	EDIT_INFO_FAILED(1029, "Information user change unsuccessful", HttpStatus.BAD_REQUEST),
+	LOGIN_FAILED(1030, "Login failed", HttpStatus.BAD_REQUEST),
 	TOKEN_EMPTY(1023,"Token is empty", HttpStatus.BAD_REQUEST);
 
 	int code;

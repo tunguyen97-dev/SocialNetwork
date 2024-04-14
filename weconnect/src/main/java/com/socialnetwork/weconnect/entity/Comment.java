@@ -33,7 +33,7 @@ public class Comment {
 
 	@ManyToOne	
 	@JoinColumn(name = "postId")
-	@JsonIgnore
+//	@JsonIgnore
 	private Post post;
 
 	@ManyToOne

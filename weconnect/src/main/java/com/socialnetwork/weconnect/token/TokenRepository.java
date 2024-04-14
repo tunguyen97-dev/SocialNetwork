@@ -5,8 +5,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.socialnetwork.weconnect.entity.User;
-
 public interface TokenRepository extends JpaRepository<Token, Integer> {
 
 	@Query(value = """
@@ -17,7 +15,5 @@ public interface TokenRepository extends JpaRepository<Token, Integer> {
 	List<Token> findAllValidTokenByUser(Integer id);
 
 	Optional<Token> findByToken(String token);
-
-	User findUserByToken(String token);
 
 }

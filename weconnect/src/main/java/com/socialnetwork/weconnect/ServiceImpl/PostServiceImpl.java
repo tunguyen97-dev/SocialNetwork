@@ -32,23 +32,18 @@ public class PostServiceImpl implements PostService {
 	public void savePostToDB(String content, List<String> files) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Post post = Post.builder()
-				.user(user)
-				.content(content)
-				.postImages(files)
-				.createdAt(sdf.format(new Date()))
-				.isDeleted(false)
-				.build();
+		Post post = Post.builder().user(user).content(content).postImages(files).createdAt(sdf.format(new Date()))
+				.isDeleted(false).build();
 		postRepository.save(post);
 	}
-	
+
 	@Transactional
 	@Override
 	public List<Post> getAllPostsByUserId() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return postRepository.findAllPostsByUserId(user.getId());
 	}
-	
+
 	@Transactional
 	@Override
 	public Post getPostById(Integer postId) {
@@ -59,7 +54,7 @@ public class PostServiceImpl implements PostService {
 		}
 		return post;
 	}
-	
+
 	@Transactional
 	@Override
 	public String delPostById(Integer postId) {
@@ -74,7 +69,7 @@ public class PostServiceImpl implements PostService {
 		postRepository.deleteById(postId);
 		return "Successfully deleted the post";
 	}
-	
+
 	@Transactional
 	@Override
 	public Post updatePostById(UpdatePostRequest updatePostRequest) {
@@ -135,5 +130,11 @@ public class PostServiceImpl implements PostService {
 		post.setPostImages(newDB);
 		post.setUpdatedAt(sdf.format(new Date()));
 		return postRepository.save(post);
+	}
+
+	@Override
+	public List<Post> getListTimeLine() {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return postRepository.getTimeLineByUserId(user.getId());
 	}
 }

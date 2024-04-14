@@ -29,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts")
 public class PostController {
-	
+
 	private final FilesStorageService storageService;
 	private final PostService postService;
 
@@ -42,44 +42,37 @@ public class PostController {
 			urlList.add(storageService.saveTosServer(file, user.getName()));
 		});
 		postService.savePostToDB(content, urlList);
-		return ApiResponse.<List<String>>builder()
-				.result(urlList)
-				.build();
+		return ApiResponse.<List<String>>builder().result(urlList).build();
 	}
 
-    //@Hidden
+	// @Hidden
 	@GetMapping("/images/{imageName:.+}")
 	public ApiResponse<String> getImage(@PathVariable String imageName) {
-		return ApiResponse.<String>builder()
-				.result(storageService.load(imageName))
-				.build();
+		return ApiResponse.<String>builder().result(storageService.load(imageName)).build();
 	}
-	
+
 	@GetMapping()
 	public ApiResponse<List<Post>> getAllPostsByUserId() {
-		return ApiResponse.<List<Post>>builder()
-				.result(postService.getAllPostsByUserId())
-				.build();
+		return ApiResponse.<List<Post>>builder().result(postService.getAllPostsByUserId()).build();
 	}
-  
+
 	@GetMapping("/post/{postId}")
 	public ApiResponse<Post> getPostByPostId(@PathVariable Integer postId) {
-		return ApiResponse.<Post>builder()
-				.result(postService.getPostById(postId))
-				.build();
+		return ApiResponse.<Post>builder().result(postService.getPostById(postId)).build();
 	}
-	
+
 	@DeleteMapping("/post/delete-post/{postId}")
 	public ApiResponse<String> delPostByPostId(@PathVariable @NotNull Integer postId) {
-		return ApiResponse.<String>builder()
-				.result(postService.delPostById(postId))
-				.build();
+		return ApiResponse.<String>builder().result(postService.delPostById(postId)).build();
 	}
-	
+
 	@PutMapping("/post/update-post")
 	public ApiResponse<Post> updatePostByPostId(@RequestBody @NotNull UpdatePostRequest updatePostRequest) {
-		return ApiResponse.<Post>builder()
-				.result(postService.updatePostById(updatePostRequest))
-				.build();
+		return ApiResponse.<Post>builder().result(postService.updatePostById(updatePostRequest)).build();
+	}
+
+	@GetMapping("/post/timeLines")
+	public ApiResponse<List<Post>> getListTimeLine() {
+		return ApiResponse.<List<Post>>builder().result(postService.getListTimeLine()).build();
 	}
 }

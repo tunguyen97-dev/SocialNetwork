@@ -5,6 +5,7 @@ import com.socialnetwork.weconnect.dto.request.AuthenticationRequest;
 import com.socialnetwork.weconnect.dto.request.ChangePasswordRequest;
 import com.socialnetwork.weconnect.dto.request.EmailRequest;
 import com.socialnetwork.weconnect.dto.request.RegisterRequest;
+import com.socialnetwork.weconnect.dto.request.VerifyRequest;
 import com.socialnetwork.weconnect.dto.response.AuthenticationResponse;
 import com.socialnetwork.weconnect.entity.Otp;
 import com.socialnetwork.weconnect.entity.User;
@@ -23,12 +24,12 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import java.util.UUID;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -58,7 +59,6 @@ public class AuthenticationService {
 	}
 
 	public AuthenticationResponse authenticate(AuthenticationRequest request) {
-		// xac thuc thong tin nguoi dung
 		authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 		var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
@@ -108,24 +108,38 @@ public class AuthenticationService {
 		}
 	}
 
-	public AuthenticationResponse verifyOtp(int optRequest, String email) {
-		Optional<User> optinalUser = userRepository.findByEmail(email);
+	public int login(AuthenticationRequest authenRequest) {
+		authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(authenRequest.getEmail(), authenRequest.getPassword()));
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		var user = userRepository.findByEmail(authenRequest.getEmail()).orElseThrow();
+		int otpNumber = generateOtp();
+		Otp otp = Otp.builder().otpNumber(otpNumber).user(user).createdAt(sdf.format(new Date())).build();
+		otp = otpRepository.save(otp);
+		if (otp == null) {
+			throw new AppException(ErrorCode.LOGIN_FAILED);
+		}
+		return otpNumber;
+
+	}
+
+	public AuthenticationResponse verifyOtp(VerifyRequest verifyRequest) {
+		Optional<User> optinalUser = userRepository.findByEmail(verifyRequest.getEmail());
 		if (!optinalUser.isPresent()) {
 			throw new AppException(ErrorCode.USER_NOT_EXISTED);
 		}
 		Optional<Otp> optionalOtp = otpRepository.findByUserId(optinalUser.get().getId());
-		if (optionalOtp.isPresent()) {
-			if (optRequest == optionalOtp.get().getOtpNumber()) {
-				var jwtToken = jwtService.generateToken(optinalUser.get());
-				var refreshToken = jwtService.generateRefreshToken(optinalUser.get());
-				revokeAllUserTokens(optinalUser.get());
-				saveUserToken(optinalUser.get(), jwtToken);
-				return AuthenticationResponse.builder().accessToken(jwtToken).refreshToken(refreshToken).build();
-			} else {
-				throw new AppException(ErrorCode.OTP_INVALID);
-			}
+		if (!optionalOtp.isPresent()) {
+			throw new AppException(ErrorCode.OTP_NOT_FOUND);
 		}
-		throw new AppException(ErrorCode.OTP_NOT_FOUND);
+		if (verifyRequest.getOtpNumber() == optionalOtp.get().getOtpNumber()) {
+			var jwtToken = jwtService.generateToken(optinalUser.get());
+			var refreshToken = jwtService.generateRefreshToken(optinalUser.get());
+			revokeAllUserTokens(optinalUser.get());
+			saveUserToken(optinalUser.get(), jwtToken);
+			return AuthenticationResponse.builder().accessToken(jwtToken).refreshToken(refreshToken).build();
+		}
+		throw new AppException(ErrorCode.OTP_INVALID);
 	}
 
 	// trường hợp dag k login và dag login va quen mk
@@ -142,22 +156,25 @@ public class AuthenticationService {
 	}
 
 	public String changePassword(ChangePasswordRequest changePasswordRequest) {
-		// valid token
-		var isTokenValid = tokenRepository.findByToken(changePasswordRequest.getToken())
-				.map(t -> !t.isExpired() && !t.isRevoked()).orElse(false);
-		if (!isTokenValid) {
+		Optional<Token> token = tokenRepository.findByToken(changePasswordRequest.getToken()).map(t -> {
+			if (t.isExpired() || t.isRevoked()) {
+				return null;
+			} else {
+				return t;
+			}
+		});
+
+		if (!token.isPresent()) {
 			throw new AppException(ErrorCode.TOKEN_INVALID);
 		}
-		User user = tokenRepository.findUserByToken(changePasswordRequest.getToken());
-		// check if the current password is correct
+
+		User user = token.get().getUser();
 		if (!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(), user.getPassword())) {
 			throw new IllegalStateException("Wrong password");
 		}
-		// check if the two new passwords are the same
 		if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmationPassword())) {
 			throw new IllegalStateException("Password are not the same");
 		}
-		// update the password
 		user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
 		user = userRepository.save(user);
 		if (user == null) {
@@ -165,19 +182,12 @@ public class AuthenticationService {
 		}
 		return "Password changed successfully";
 	}
-	
-	@Transactional
-	public String deleteUser() {
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		boolean existUser= userRepository.existsById(user.getId());
-		if (!existUser) {
-			throw new AppException(ErrorCode.USER_NOT_EXISTED);
-		}
-		int resultDelete = userRepository.deleteUserById(user.getId());
-		if (resultDelete != 1) {
-			return "Xử lý xoá không thành công";
-		}
-		return "Xử lý xoá thành công";
+
+	public int generateOtp() {
+		UUID uuid = UUID.randomUUID();
+		String otpString = uuid.toString().replaceAll("[^0-9]", "");
+		int otp = Integer.parseInt(otpString.substring(0, 5));
+		return otp;
 	}
 
 }

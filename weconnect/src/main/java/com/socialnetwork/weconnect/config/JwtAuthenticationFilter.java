@@ -47,9 +47,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			return;
 		}
 		final String authHeader = request.getHeader("Authorization");
-		if (authHeader == null) {
-			handleNullJwt(request, response);
-		}
 
 		final String jwt;
 		final String userEmail;
@@ -69,23 +66,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authToken);
 			}
-			response.setStatus(ErrorCode.TOKEN_NOT_FOUND.getCode());
+			
 		}
 		filterChain.doFilter(request, response);
-	}
-
-	private void handleNullJwt(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		// Xử lý khi JWT là null, ví dụ trả về mã lỗi hoặc thông báo lỗi
-		ErrorCode errorCode = ErrorCode.TOKEN_EMPTY;
-		response.setStatus(errorCode.getCode());
-		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-		ApiResponse<?> apiResponse = ApiResponse.builder().code(errorCode.getCode()).message(errorCode.getMessage())
-				.build();
-
-		ObjectMapper objectMapper = new ObjectMapper();
-
-		response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
-
 	}
 }

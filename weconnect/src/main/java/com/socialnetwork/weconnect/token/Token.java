@@ -1,5 +1,8 @@
 package com.socialnetwork.weconnect.token;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.socialnetwork.weconnect.entity.User;
 
 import jakarta.persistence.Column;
@@ -24,21 +27,21 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Token {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  public Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public Integer id;
 
-  @Column(unique = true)
-  public String token;
+	@Column(unique = true)
+	public String token;
 
-  @Enumerated(EnumType.STRING)
-  public TokenType tokenType = TokenType.BEARER;
+	@Enumerated(EnumType.STRING)
+	public TokenType tokenType = TokenType.BEARER;
 
-  public boolean revoked;
+	public boolean revoked;
 
-  public boolean expired;
+	public boolean expired;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
-  public User user;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	public User user;
 }
