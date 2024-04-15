@@ -160,7 +160,7 @@ public class AuthenticationService {
 			if (t.isExpired() || t.isRevoked()) {
 				return null;
 			} else {
-				return t;
+ 				return t;
 			}
 		});
 
@@ -169,9 +169,9 @@ public class AuthenticationService {
 		}
 
 		User user = token.get().getUser();
-		if (!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(), user.getPassword())) {
-			throw new IllegalStateException("Wrong password");
-		}
+//		if (!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(), user.getPassword())) {
+//			throw new IllegalStateException("Wrong password");
+//		}
 		if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmationPassword())) {
 			throw new IllegalStateException("Password are not the same");
 		}

@@ -3,6 +3,7 @@ package com.socialnetwork.weconnect.entity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.Entity;
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @Table(name = "post_comments")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Comment {
 	
 	@Id
@@ -33,12 +35,11 @@ public class Comment {
 
 	@ManyToOne	
 	@JoinColumn(name = "postId")
-//	@JsonIgnore
+	@JsonIgnore
 	private Post post;
 
 	@ManyToOne
 	@JoinColumn(name = "userId")
-//	@JsonIgnoreProperties({"email", "password", "role", "tokens", "posts", "postLikes"})
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
 	private User user;

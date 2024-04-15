@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.socialnetwork.weconnect.config.Role;
 import com.socialnetwork.weconnect.token.Token;
 
@@ -28,6 +29,7 @@ import com.socialnetwork.weconnect.token.Token;
 @NoArgsConstructor
 @Entity
 @Table(name = "user")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User implements UserDetails {
 
 	private static final long serialVersionUID = 1L;

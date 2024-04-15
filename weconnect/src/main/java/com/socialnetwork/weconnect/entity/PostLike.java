@@ -3,6 +3,8 @@ package com.socialnetwork.weconnect.entity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
@@ -24,6 +26,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @Table(name = "post_likes")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostLike {
 	
 	@Id

@@ -13,7 +13,6 @@ import lombok.experimental.FieldDefaults;
 public class ChangePasswordRequest {
 	
 	String token;
-	String currentPassword;
 	String newPassword;
 	String confirmationPassword;
 }
