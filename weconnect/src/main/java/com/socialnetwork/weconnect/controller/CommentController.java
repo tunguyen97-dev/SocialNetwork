@@ -14,6 +14,7 @@ import com.socialnetwork.weconnect.Service.CommentService;
 import com.socialnetwork.weconnect.dto.request.CommentRequest;
 import com.socialnetwork.weconnect.dto.request.UpdateCommentRequest;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
 import com.socialnetwork.weconnect.entity.Comment;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,8 @@ public class CommentController {
 	private final CommentService commentService;
 
 	@DeleteMapping("/comment/delete-comment/{commentId}")
-	public ApiResponse<String> delCommentByCommentId(@PathVariable @NotNull Integer commentId) {
-		return ApiResponse.<String>builder()
+	public ApiResponse<CntResponse> delCommentByCommentId(@PathVariable @NotNull Integer commentId) {
+		return ApiResponse.<CntResponse>builder()
 				.result(commentService.delCommentById(commentId))
 				.build();
 	}
@@ -50,13 +51,6 @@ public class CommentController {
 	public ApiResponse<Comment> updateCommentByCommentId(@RequestBody @NotNull UpdateCommentRequest updateCommentRequest) {
 		return ApiResponse.<Comment>builder()
 				.result(commentService.updateCommentById(updateCommentRequest))
-				.build();
-	}
-
-	@PutMapping("comment/{commentId}/lock") 
-	public ApiResponse<String> lockCommentByCommentId(@PathVariable @NotNull Integer commentId) {
-		return ApiResponse.<String>builder()
-				.result(commentService.lockCommentById(commentId))
 				.build();
 	}
 

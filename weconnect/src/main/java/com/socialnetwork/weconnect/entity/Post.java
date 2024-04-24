@@ -52,7 +52,7 @@ public class Post {
 
 	@ElementCollection
 	@CollectionTable(name = "post_images")
-	@JsonIgnore
+//	@JsonIgnore
 	private List<String> postImages;
 
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)

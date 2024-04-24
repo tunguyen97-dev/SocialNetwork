@@ -30,6 +30,4 @@ public class RegisterRequest {
 	
 	@DobConstraint(min = 18, message = "LOCK_COMMENT_FAILED")
 	String birthday;
-	
-	Role role;
 }

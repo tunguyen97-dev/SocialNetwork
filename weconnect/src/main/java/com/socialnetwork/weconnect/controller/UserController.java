@@ -17,6 +17,7 @@ import com.socialnetwork.weconnect.dto.request.ChangePasswordRequest;
 import com.socialnetwork.weconnect.dto.request.FileInfo;
 import com.socialnetwork.weconnect.dto.request.UserInforRequest;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
 import com.socialnetwork.weconnect.dto.response.UserInforRestponse;
 
 import jakarta.validation.Valid;
@@ -45,8 +46,10 @@ public class UserController {
 	}
 
 	@DeleteMapping("/user/delete-user")
-	public ApiResponse<String> deleteUser() {
-		return ApiResponse.<String>builder().result(userService.deleteUser()).build();
+	public ApiResponse<CntResponse> deleteUser() {
+		return ApiResponse.<CntResponse>builder()
+				.result(userService.deleteUser())
+				.build();
 	}
 
 	@GetMapping("/user/getInformation")

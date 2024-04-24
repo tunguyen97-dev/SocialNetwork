@@ -1,5 +1,6 @@
 package com.socialnetwork.weconnect.controller;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -20,6 +21,8 @@ import com.socialnetwork.weconnect.dto.request.RegisterRequest;
 import com.socialnetwork.weconnect.dto.request.VerifyRequest;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
 import com.socialnetwork.weconnect.dto.response.AuthenticationResponse;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
+
 import java.io.IOException;
 
 @RestController
@@ -31,10 +34,10 @@ public class AuthenticationController {
 	AuthenticationService authenticationService;
 
 	@PostMapping("/register")
-	public ApiResponse<AuthenticationResponse> register(@RequestBody @Valid RegisterRequest request) {
-		ApiResponse<AuthenticationResponse> apiResponse = new ApiResponse<>();
-		apiResponse.setResult(authenticationService.register(request));
-		return apiResponse;
+	public ApiResponse<CntResponse> register(@RequestBody @Valid RegisterRequest request) {
+		return ApiResponse.<CntResponse>builder()
+				.result(authenticationService.register(request))
+				.build();
 	}
 
 	@PostMapping("/authenticate")
@@ -44,13 +47,13 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/refresh-token")
-	public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		authenticationService.refreshToken(request, response);
 	}
 
 	@PostMapping("/login")
-	public ApiResponse<Integer> login(@RequestBody AuthenticationRequest request) {
-		return ApiResponse.<Integer>builder()
+	public ApiResponse<CntResponse> login(@RequestBody AuthenticationRequest request) {
+		return ApiResponse.<CntResponse>builder()
 				.result(authenticationService.login(request))
 				.build();
 	}
@@ -69,8 +72,9 @@ public class AuthenticationController {
 	}
 	
 	@PutMapping("/user/change-password")
-	public ApiResponse<String> changePassword(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
-		return ApiResponse.<String>builder().result(authenticationService.changePassword(changePasswordRequest))
+	public ApiResponse<CntResponse> changePassword(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
+		return ApiResponse.<CntResponse>builder()
+				.result(authenticationService.changePassword(changePasswordRequest))
 				.build();
 	}
 }

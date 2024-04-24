@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.socialnetwork.weconnect.Service.CommentService;
 import com.socialnetwork.weconnect.dto.request.CommentRequest;
 import com.socialnetwork.weconnect.dto.request.UpdateCommentRequest;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
 import com.socialnetwork.weconnect.entity.Comment;
 import com.socialnetwork.weconnect.entity.Post;
 import com.socialnetwork.weconnect.entity.User;
@@ -99,7 +100,7 @@ public class CommentServiceImpl implements CommentService {
 	
 	@Transactional
 	@Override
-	public String delCommentById(Integer commentId) {
+	public CntResponse delCommentById(Integer commentId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Optional<Comment> optionalComment = commentRepository.findById(commentId);
 		if (optionalComment.isPresent()) {
@@ -108,7 +109,10 @@ public class CommentServiceImpl implements CommentService {
 				throw new AppException(ErrorCode.UNAUTHORIZED);
 			}
 			commentRepository.deleteById(commentId);
-			return "Đã xoá comment thành công";
+			return CntResponse.builder()
+					.resultCnt(1)
+					.message("Đã xoá comment thành công")
+					.build();
 		} else {
 			throw new AppException(ErrorCode.COMMENT_NOT_EXISTED);
 		}
@@ -116,16 +120,25 @@ public class CommentServiceImpl implements CommentService {
 	
 	@Transactional
 	@Override
-	public String lockCommentById(Integer commentId) {
+	public CntResponse lockCommentById(Integer commentId, boolean isLock) {
 		Optional<Comment> optionalComment = commentRepository.findById(commentId);
 		if (optionalComment.isPresent()) {
 			Comment comment = optionalComment.get();
-			comment.setIsDeleted(true);
-			Comment commentResult = commentRepository.save(comment);
-			if (commentResult == null) {
+			comment.setIsDeleted(isLock);
+			comment = commentRepository.save(comment);
+			if (comment == null) {
 				throw new AppException(ErrorCode.LOCK_COMMENT_FAILED);
 			}
-			return "Đã khoá comment thành công";
+			if (isLock) {
+				return CntResponse.builder()
+						.resultCnt(1)
+						.message("Đã khoá comment thành công")
+						.build();
+			}
+			return CntResponse.builder()
+					.resultCnt(1)
+					.message("Đã mở khoá comment thành công")
+					.build();
 		} else {
 			throw new AppException(ErrorCode.COMMENT_NOT_EXISTED);
 		}

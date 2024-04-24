@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.socialnetwork.weconnect.Service.FilesStorageService;
 import com.socialnetwork.weconnect.Service.PostService;
 import com.socialnetwork.weconnect.dto.request.UpdatePostRequest;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
 import com.socialnetwork.weconnect.entity.Post;
 import com.socialnetwork.weconnect.entity.User;
 import com.socialnetwork.weconnect.exception.AppException;
@@ -57,7 +58,7 @@ public class PostServiceImpl implements PostService {
 
 	@Transactional
 	@Override
-	public String delPostById(Integer postId) {
+	public CntResponse delPostById(Integer postId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (!postRepository.existsById(postId)) {
 			throw new AppException(ErrorCode.POST_NOT_EXISTED);
@@ -67,7 +68,10 @@ public class PostServiceImpl implements PostService {
 			throw new AppException(ErrorCode.UNAUTHORIZED);
 		}
 		postRepository.deleteById(postId);
-		return "Successfully deleted the post";
+		return CntResponse.builder()
+				.resultCnt(1)
+				.message("Successfully deleted the post")
+				.build();
 	}
 
 	@Transactional

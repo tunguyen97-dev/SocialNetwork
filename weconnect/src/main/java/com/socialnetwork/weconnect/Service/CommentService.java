@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import com.socialnetwork.weconnect.dto.request.CommentRequest;
 import com.socialnetwork.weconnect.dto.request.UpdateCommentRequest;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
 import com.socialnetwork.weconnect.entity.Comment;
 
 @Service
@@ -17,7 +18,8 @@ public interface CommentService {
 
 	public Comment updateCommentById(UpdateCommentRequest updateCommentRequest);
 
-	public String delCommentById(Integer commentId);
+	public CntResponse delCommentById(Integer commentId);
 
-	public String lockCommentById(Integer commentId);
+	public CntResponse lockCommentById(Integer commentId, boolean isLock);
+	
 }

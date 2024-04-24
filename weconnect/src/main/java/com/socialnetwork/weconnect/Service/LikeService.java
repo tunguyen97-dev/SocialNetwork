@@ -2,7 +2,9 @@ package com.socialnetwork.weconnect.Service;
 
 import org.springframework.stereotype.Service;
 
+import com.socialnetwork.weconnect.dto.response.CntResponse;
+
 @Service
 public interface LikeService {
-	String likePostByPostId(Integer postId);
+	CntResponse likePostByPostId(Integer postId);
 }

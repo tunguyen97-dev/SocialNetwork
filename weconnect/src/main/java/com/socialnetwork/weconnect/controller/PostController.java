@@ -4,6 +4,8 @@ import com.socialnetwork.weconnect.Service.FilesStorageService;
 import com.socialnetwork.weconnect.Service.PostService;
 import com.socialnetwork.weconnect.dto.request.UpdatePostRequest;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
+import com.socialnetwork.weconnect.dto.response.PostResponse;
 import com.socialnetwork.weconnect.entity.Post;
 import com.socialnetwork.weconnect.entity.User;
 import jakarta.validation.constraints.NotNull;
@@ -34,15 +36,17 @@ public class PostController {
 	private final PostService postService;
 
 	@PostMapping(value = "/add-post", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ApiResponse<List<String>> uploadPost(@RequestPart("content") String content,
+	public ApiResponse<PostResponse> uploadPost(@RequestPart("content") String content,
 			@RequestPart("files") MultipartFile[] imageFiles, Principal connectedUser) {
 		var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
 		List<String> urlList = new ArrayList<>();
 		Arrays.asList(imageFiles).stream().forEach(file -> {
 			urlList.add(storageService.saveTosServer(file, user.getName()));
 		});
-		postService.savePostToDB(content, urlList);
-		return ApiResponse.<List<String>>builder().result(urlList).build();
+		postService.savePostToDB(content, urlList);		
+		return ApiResponse.<PostResponse>builder()
+				.result(PostResponse.builder().content(content).urlImages(urlList).build())
+				.build();
 	}
 
 	// @Hidden
@@ -62,8 +66,8 @@ public class PostController {
 	}
 
 	@DeleteMapping("/post/delete-post/{postId}")
-	public ApiResponse<String> delPostByPostId(@PathVariable @NotNull Integer postId) {
-		return ApiResponse.<String>builder().result(postService.delPostById(postId)).build();
+	public ApiResponse<CntResponse> delPostByPostId(@PathVariable @NotNull Integer postId) {
+		return ApiResponse.<CntResponse>builder().result(postService.delPostById(postId)).build();
 	}
 
 	@PutMapping("/post/update-post")

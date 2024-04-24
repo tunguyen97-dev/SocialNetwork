@@ -2,12 +2,14 @@ package com.socialnetwork.weconnect.Service;
 
 import org.springframework.stereotype.Service;
 
+import com.socialnetwork.weconnect.dto.response.CntResponse;
+
 @Service
 public interface FriendService {
 	
-	String addFriendRequest(Integer ReceiverId);
+	CntResponse addFriendRequest(Integer ReceiverId);
 	
-	String cancelFriendRequest(Integer ReceiverId);
+	CntResponse cancelFriendRequest(Integer ReceiverId);
 	
-	String acceptFriendRequest(Integer senderId);
+	CntResponse acceptFriendRequest(Integer senderId);
 }

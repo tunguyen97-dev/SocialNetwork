@@ -2,6 +2,7 @@ package com.socialnetwork.weconnect.Service;
 
 import org.springframework.stereotype.Service;
 import com.socialnetwork.weconnect.dto.request.UserInforRequest;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
 import com.socialnetwork.weconnect.dto.response.UserInforRestponse;
 
 @Service
@@ -11,6 +12,6 @@ public interface UserService {
 
 	UserInforRestponse editInformationUser(UserInforRequest userInforRequest);
 	
-	String deleteUser();
+	CntResponse deleteUser();
 	
 }

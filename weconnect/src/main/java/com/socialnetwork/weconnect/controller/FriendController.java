@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.socialnetwork.weconnect.Service.FriendService;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -20,17 +21,23 @@ public class FriendController {
 	private final FriendService friendService;
 
 	@PostMapping("/friend/add-friend/{receiverId}")
-	public ApiResponse<String> addFriend(@PathVariable @NotNull Integer receiverId) {
-		return ApiResponse.<String>builder().result(friendService.addFriendRequest(receiverId)).build();
+	public ApiResponse<CntResponse> addFriend(@PathVariable @NotNull Integer receiverId) {
+		return ApiResponse.<CntResponse>builder()
+				.result(friendService.addFriendRequest(receiverId))
+				.build();
 	}
 
 	@DeleteMapping("/friend/cancel-friend/{receiverId}")
-	public ApiResponse<String> cancelFriend(@PathVariable @NotNull Integer receiverId) {
-		return ApiResponse.<String>builder().result(friendService.cancelFriendRequest(receiverId)).build();
+	public ApiResponse<CntResponse> cancelFriend(@PathVariable @NotNull Integer receiverId) {
+		return ApiResponse.<CntResponse>builder()
+				.result(friendService.cancelFriendRequest(receiverId))
+				.build();
 	}
 
 	@PostMapping("/friend/accept-friend/{senderId}")
-	public ApiResponse<String> acceptFriend(@PathVariable @NotNull Integer senderId) {
-		return ApiResponse.<String>builder().result(friendService.acceptFriendRequest(senderId)).build();
+	public ApiResponse<CntResponse> acceptFriend(@PathVariable @NotNull Integer senderId) {
+		return ApiResponse.<CntResponse>builder()
+				.result(friendService.acceptFriendRequest(senderId))
+				.build();
 	}
 }

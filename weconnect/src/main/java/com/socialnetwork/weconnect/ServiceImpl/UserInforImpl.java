@@ -4,10 +4,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.socialnetwork.weconnect.Service.UserService;
 import com.socialnetwork.weconnect.dto.request.UserInforRequest;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
 import com.socialnetwork.weconnect.dto.response.UserInforRestponse;
+import com.socialnetwork.weconnect.entity.Friend;
 import com.socialnetwork.weconnect.entity.User;
 import com.socialnetwork.weconnect.exception.AppException;
 import com.socialnetwork.weconnect.exception.ErrorCode;
+import com.socialnetwork.weconnect.repository.FriendRepository;
 import com.socialnetwork.weconnect.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import lombok.experimental.FieldDefaults;
 public class UserInforImpl implements UserService {
 
 	UserRepository userRepository;
+	FriendRepository friendRepository;
     
 	@Override
 	public UserInforRestponse getInformationUser() {
@@ -47,13 +51,15 @@ public class UserInforImpl implements UserService {
 	}
 
 	@Override
-	public String deleteUser() {
+	public CntResponse deleteUser() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		int resultDelete = userRepository.deleteUserById(user.getId());
-		if (resultDelete != 1) {
-			return "Xử lý xoá không thành công";
-		}
-		return "Xử lý xoá thành công";
+		//ktra tồn tại userId nếu del lần 2 dag ném ra Unauthenticated => jwt
+		// xử lý xoá friend và friend request trước
+		userRepository.deleteById(user.getId());
+		return CntResponse.builder()
+				.resultCnt(1)
+				.message("Xử lý xoá thành công")
+				.build();
 	}
 
 }

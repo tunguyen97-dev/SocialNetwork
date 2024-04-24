@@ -43,6 +43,13 @@ public enum ErrorCode {
 	PASSWORD_CHANGE_FAILED(1028, "Password change unsuccessful", HttpStatus.BAD_REQUEST),
 	EDIT_INFO_FAILED(1029, "Information user change unsuccessful", HttpStatus.BAD_REQUEST),
 	LOGIN_FAILED(1030, "Login failed", HttpStatus.BAD_REQUEST),
+	REGISTER_FAILED(1031, "Register failed", HttpStatus.BAD_REQUEST),
+	RECEIVER_NOT_EXISTS(1032, "Receiver not existed", HttpStatus.NOT_FOUND),
+	NOT_ADDED_REQUEST(1033, "No friend requests exist", HttpStatus.NOT_FOUND),
+	SEND_FRIEND_EXISTS(1034, "Send friend already exists", HttpStatus.BAD_REQUEST),
+	ACCEPT_FRIEND_NOT_EXISTS(1035, "Accept friend not existed", HttpStatus.NOT_FOUND),
+	SENDER_NOT_EXISTS(1036, "Sender not existed", HttpStatus.NOT_FOUND),
+	TOKEN_EXPIRED(1037,"Token expired and must be rejected", HttpStatus.BAD_REQUEST),
 	TOKEN_EMPTY(1023,"Token is empty", HttpStatus.BAD_REQUEST);
 
 	int code;

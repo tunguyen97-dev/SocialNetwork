@@ -1,6 +1,7 @@
 package com.socialnetwork.weconnect.Service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -84,6 +85,8 @@ public class JwtService {
 		try {
 
 			return Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(token).getBody();
+		} catch (ExpiredJwtException e) {
+			response.setStatus(ErrorCode.TOKEN_EXPIRED.getCode());
 		} catch (Exception e) {
 			response.setStatus(ErrorCode.INVALID_SIGNATURE.getCode());
 		}

@@ -13,6 +13,7 @@ import jakarta.transaction.TransactionScoped;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,7 +28,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialnetwork.weconnect.Service.JwtService;
 import com.socialnetwork.weconnect.dto.response.ApiResponse;
+import com.socialnetwork.weconnect.exception.AppException;
 import com.socialnetwork.weconnect.exception.ErrorCode;
+import com.socialnetwork.weconnect.token.Token;
 import com.socialnetwork.weconnect.token.TokenRepository;
 
 @Component
@@ -60,13 +63,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 			var isTokenValid = tokenRepository.findByToken(jwt).map(t -> !t.isExpired() && !t.isRevoked())
 					.orElse(false);
+			if (!isTokenValid) {
+				response.setStatus(ErrorCode.TOKEN_NOT_FOUND.getCode());
+			}
 			if (jwtService.isTokenValid(jwt, userDetails, response) && isTokenValid) {
 				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
 						null, userDetails.getAuthorities());
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authToken);
 			}
-			
 		}
 		filterChain.doFilter(request, response);
 	}

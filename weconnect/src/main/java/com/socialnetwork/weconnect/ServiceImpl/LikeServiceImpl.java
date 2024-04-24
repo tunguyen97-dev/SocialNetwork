@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.socialnetwork.weconnect.Service.LikeService;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
 import com.socialnetwork.weconnect.entity.PostLike;
 import com.socialnetwork.weconnect.entity.User;
 import com.socialnetwork.weconnect.exception.AppException;
@@ -26,7 +27,7 @@ public class LikeServiceImpl implements LikeService {
 
 	@Transactional
 	@Override
-	public String likePostByPostId(Integer postId) {
+	public CntResponse likePostByPostId(Integer postId) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (!postRepository.existsById(postId)) {
@@ -35,7 +36,10 @@ public class LikeServiceImpl implements LikeService {
 	    PostLike existingLike = likeRepository.findByPostIdAndUserId(postId, user.getId());
 	    if (existingLike != null) {
 	        likeRepository.deleteById(existingLike.getId());
-	        return "Successfully unliked the post";
+	        return CntResponse.builder()
+	        		.resultCnt(1)
+	        		.message("Successfully unliked the post")
+	        		.build();
 	    } else {
 	        PostLike postLike = PostLike.builder()
 	            .createdAt(sdf.format(new Date()))
@@ -46,7 +50,11 @@ public class LikeServiceImpl implements LikeService {
 	        if (postLike == null) {
 	        	throw new AppException(ErrorCode.LIKE_FAILED);
 	        }
-	        return "Successfully liked the post";
+	        return CntResponse.builder()
+	        		.resultCnt(1)
+	        		.message("Successfully liked the post")
+	        		.build();
+	        		
 	    }
 	}
 }

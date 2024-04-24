@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.socialnetwork.weconnect.Service.FriendService;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
 import com.socialnetwork.weconnect.entity.Friend;
 import com.socialnetwork.weconnect.entity.FriendRequest;
 import com.socialnetwork.weconnect.entity.User;
@@ -30,49 +31,65 @@ public class FriendServiceImpl implements FriendService {
 	
 	@Transactional
 	@Override
-	public String addFriendRequest(Integer receiverId) {
+	public CntResponse addFriendRequest(Integer receiverId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (receiverId.equals(user.getId())) {
 			throw new AppException(ErrorCode.DUPLICATE_ID);
+		} else if (!userRepository.existsById(receiverId)) {
+			throw new AppException(ErrorCode.RECEIVER_NOT_EXISTS);
 		} else if (friendRequestRepository.existsBySenderIdAndReceiverIdOrReceiverIdAndSenderId(user.getId(), receiverId, user.getId(), receiverId)) {
-			throw new AppException(ErrorCode.SEND_FRIEND_FAILED);
+			throw new AppException(ErrorCode.SEND_FRIEND_EXISTS);
 		}
 		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         FriendRequest friendRequest = FriendRequest.builder()
         		.receiver(userRepository.findUserById(receiverId))
         		.sender(user)
-        		.createdAt(null)
+        		.createdAt(sdf.format(new Date()))
         		.build();
         friendRequest = friendRequestRepository.save(friendRequest);
-		return "Friend request sent successfully";
+        if (friendRequest == null) {
+        	throw new AppException(ErrorCode.SEND_FRIEND_FAILED);
+		}
+		return CntResponse.builder()
+				.resultCnt(1)
+				.message("Friend request sent successfully")
+				.build();
 	}
 	
 	@Transactional
 	@Override
-	public String cancelFriendRequest(Integer receiverId) {
+	public CntResponse cancelFriendRequest(Integer receiverId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (receiverId.equals(user.getId())) {
 			throw new AppException(ErrorCode.DUPLICATE_ID);
+		} else if (!userRepository.existsById(receiverId)) {
+			throw new AppException(ErrorCode.RECEIVER_NOT_EXISTS);
 		} else if (!friendRequestRepository.existsBySenderIdAndReceiverId(user.getId(), receiverId)) {
-			throw new AppException(ErrorCode.CANCEL_FRIEND_FAILED);
+			throw new AppException(ErrorCode.NOT_ADDED_REQUEST);
 		}
 		
         int resultCancel = friendRequestRepository.deleteBySenderIdAndReceiverId(user.getId(), receiverId);
         if (resultCancel != 1) {
         	throw new AppException(ErrorCode.CANCEL_FRIEND_FAILED);
 		}
-		return "Friend request cancelled successfully";
+		return CntResponse.builder()
+				.resultCnt(resultCancel)
+				.message("Friend request cancelled successfully")
+				.build();
 	}
 	
 	@Transactional
 	@Override
-	public String acceptFriendRequest(Integer senderId) {
+	public CntResponse acceptFriendRequest(Integer senderId) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (senderId.equals(user.getId())) {
 			throw new AppException(ErrorCode.DUPLICATE_ID);
+		} else if (!userRepository.existsById(senderId)) {
+			throw new AppException(ErrorCode.SENDER_NOT_EXISTS);
 		} else if (!friendRequestRepository.existsBySenderIdAndReceiverId(senderId, user.getId())) {
-			throw new AppException(ErrorCode.ACCEPT_FRIEND_FAILED);
+			throw new AppException(ErrorCode.ACCEPT_FRIEND_NOT_EXISTS);
 		} 
 
 		Friend friend = Friend.builder()
@@ -89,7 +106,10 @@ public class FriendServiceImpl implements FriendService {
         if (resultCancel != 1) {
         	throw new AppException(ErrorCode.ACCEPT_FRIEND_FAILED);
 		}
-		return "Friend request accepted successfully";
+		return CntResponse.builder()
+				.resultCnt(resultCancel)
+				.message("Friend request accepted successfully")
+				.build();
 	}
 	
 }

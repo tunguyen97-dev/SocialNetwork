@@ -1,12 +1,14 @@
 package com.socialnetwork.weconnect.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.socialnetwork.weconnect.config.Role;
 import com.socialnetwork.weconnect.dto.request.AuthenticationRequest;
 import com.socialnetwork.weconnect.dto.request.ChangePasswordRequest;
 import com.socialnetwork.weconnect.dto.request.EmailRequest;
 import com.socialnetwork.weconnect.dto.request.RegisterRequest;
 import com.socialnetwork.weconnect.dto.request.VerifyRequest;
 import com.socialnetwork.weconnect.dto.response.AuthenticationResponse;
+import com.socialnetwork.weconnect.dto.response.CntResponse;
 import com.socialnetwork.weconnect.entity.Otp;
 import com.socialnetwork.weconnect.entity.User;
 import com.socialnetwork.weconnect.exception.AppException;
@@ -43,19 +45,25 @@ public class AuthenticationService {
 	AuthenticationManager authenticationManager;
 	OtpRepository otpRepository;
 
-	public AuthenticationResponse register(RegisterRequest request) {
+	public CntResponse register(RegisterRequest request) {
 		Optional<User> userCheck = userRepository.findByEmail(request.getEmail());
 		if (userCheck.isPresent()) {
 			throw new AppException(ErrorCode.USER_EXITED);
 		}
-		var user = User.builder().name(request.getUserName()).email(request.getEmail())
-				.password(passwordEncoder.encode(request.getPassword())).role(request.getRole()).build();
-		var savedUser = userRepository.save(user);
-		var jwtToken = jwtService.generateToken(user);
-		var refreshToken = jwtService.generateRefreshToken(user);
-		saveUserToken(savedUser, jwtToken);
-
-		return AuthenticationResponse.builder().accessToken(jwtToken).refreshToken(refreshToken).build();
+		User user = User.builder()
+				.name(request.getUserName())
+				.email(request.getEmail())
+				.password(passwordEncoder.encode(request.getPassword()))
+				.role(Role.USER)
+				.build();
+		user = userRepository.save(user);
+		if (user == null) {
+			throw new AppException(ErrorCode.REGISTER_FAILED);
+		}
+		return CntResponse.builder()
+				.resultCnt(1)
+				.message("Register success")
+				.build();
 	}
 
 	public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -108,7 +116,7 @@ public class AuthenticationService {
 		}
 	}
 
-	public int login(AuthenticationRequest authenRequest) {
+	public CntResponse login(AuthenticationRequest authenRequest) {
 		authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(authenRequest.getEmail(), authenRequest.getPassword()));
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -119,8 +127,10 @@ public class AuthenticationService {
 		if (otp == null) {
 			throw new AppException(ErrorCode.LOGIN_FAILED);
 		}
-		return otpNumber;
-
+		return CntResponse.builder()
+				.resultCnt(otpNumber)
+				.message("Mã OTP đã được trả về thành công")
+				.build();
 	}
 
 	public AuthenticationResponse verifyOtp(VerifyRequest verifyRequest) {
@@ -155,7 +165,7 @@ public class AuthenticationService {
 		return AuthenticationResponse.builder().accessToken(jwtToken).refreshToken(refreshToken).build();
 	}
 
-	public String changePassword(ChangePasswordRequest changePasswordRequest) {
+	public CntResponse changePassword(ChangePasswordRequest changePasswordRequest) {
 		Optional<Token> token = tokenRepository.findByToken(changePasswordRequest.getToken()).map(t -> {
 			if (t.isExpired() || t.isRevoked()) {
 				return null;
@@ -180,7 +190,10 @@ public class AuthenticationService {
 		if (user == null) {
 			throw new AppException(ErrorCode.PASSWORD_CHANGE_FAILED);
 		}
-		return "Password changed successfully";
+		return CntResponse.builder()
+				.resultCnt(1)
+				.message("Password changed successfully")
+				.build();
 	}
 
 	public int generateOtp() {

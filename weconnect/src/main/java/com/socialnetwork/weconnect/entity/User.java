@@ -19,6 +19,8 @@ import lombok.NoArgsConstructor;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.socialnetwork.weconnect.config.Role;
 import com.socialnetwork.weconnect.token.Token;
@@ -44,7 +46,7 @@ public class User implements UserDetails {
 	private String profession;
 	private String birthday;
 	private String address;
-
+    
 	@Enumerated(EnumType.STRING)
 	Role role;
 
